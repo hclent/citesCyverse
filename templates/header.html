@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<!-- Basic site information: encoding, stylesheet, and icon  -->
+<head>
+	<meta charset = "utf-8">
+
+	<title>CitesCyverse</title>
+
+	<meta name="viewport" content="width=device-width,
+	initial-scale=1">
+
+	<link href= "{{ url_for('static',
+	filename='js/third-party/bootstrap/dist/css/bootstrap.min.css')}}" rel="stylesheet">
+
+	<!-- url image icon goes here -->
+	<link rel="shortcut icon" href="{{url_for('static', filename='cyverse.ico') }}">
+
+</head>
+
+<header>
+<!-- LOGO OR  -->
+	<!--<div class="navbar-header">-->
+    	<!--<a class="navbar-brand" href="/home/">-->
+    	<!--<img  style="max-width:100px; margin-top: -7px"-->
+    	<!--src="{{url_for('static', filename='images/scke1.png') }}">-->
+		<!--</a>-->
+	<!--</div>-->
+
+
+
+<!--HOME BUTTON-->
+<div class="container-fluid">
+		<!-- 'Home' button that goes to main URL-->
+		<a href="/home/">
+			<button type="button" class="btn btn-primary" aria-label="Left Align" style="margine-top: 5px; margin-bottom: 5px; height: 45px; margin-right: 15px">
+			<span class="glyphicon glyphicon-header" aria-hidden="true"></span>ome
+		</button>
+	</a>
+</div>
+
+
+
+</header>
+
+
+<body>
+
+	<script src="{{ url_for('static', filename='js/third-party/jquery/dist/jquery.min.js') }}"></script>
+
+	<script type="text/javascript" src="{{ url_for('static', filename='js/third-party/bootstrap/dist/js/bootstrap.min.js') }}">
+	</script>
+
+
+blah blah blah blah
+</body>
+</html>

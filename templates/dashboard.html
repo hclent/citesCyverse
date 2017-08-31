@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+{% extends "header.html" %}
+
+{% block body %}
+
+<!-- Progress modal -->
+<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+        <h4 class="modal-title" id="myModalLabel">Loading</h4>
+      </div>
+      <div class="modal-body">
+				<!-- Progress bar that doesn't actually move -->
+				<div class="progress">
+				  <div class="progress-bar progress-bar-primary progress-bar-striped active" role="progressbar" aria-valuenow="1" aria-valuemin="0" aria-valuemax="100" style="width: 45%">
+				    <span class="sr-only">45% Complete</span>
+				  </div>
+				</div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- Tabs -->
+<div>
+
+  <!-- Define Nav tabs -->
+  <ul class="nav nav-tabs" role="tablist">
+    <li role="presentation"><a  aria-controls="journals" role="tab" data-toggle="tab">Journals</a></li>
+    <li role="presentation"><a  aria-controls="ner" role="tab" data-toggle="tab">Keywords</a></li>
+    <li role="presentation"><a aria-controls="topics" role="tab" data-toggle="tab">Topics</a></li>
+    <li role="presentation"><a aria-controls="scifi" role="tab" data-toggle="tab">TextCompare</a></li>
+  </ul>
+
+
+  <!-- Tab panes -->
+	<ul class="tab-content">
+
+
+		<!--  Put journals here -->
+		<div role="tabpanel" class="tab-pane fade" id="journals">
+           <iframe  id="journals"  src="/cy-journals/" width="1100" height="1350" marginwidth="0" marginheight="0" scrolling="no" frameBorder="0"></iframe>
+		</div>
+
+
+		<!--  Put NERs here -->
+		<div role="tabpanel" class="tab-pane fade" id="ner">
+           <iframe  id="wordcloud" style="display:none" src="/cy-wordcloud/" width="1100" height="1000" marginwidth="0" marginheight="0" scrolling="no" frameBorder="0"></iframe>
+		</div>
+
+
+
+		<!-- Data analysis/visualization-->
+		<div role="tabpanel" class="tab-pane fade" id="topics">
+            <iframe  id="embedding" style="display:none" src="/cy-embeddings/" width="1000" height="1600" marginwidth="0" marginheight="0" scrolling="no" frameBorder="0"></iframe>
+        </div>
+
+
+
+        <!--  Scifi -->
+		<div role="tabpanel" class="tab-pane fade" id="scifi">
+            <iframe  id="textcompare"  src="/cy-textcompare/" width="1100" height="800" marginwidth="0" marginheight="0" scrolling="no" frameBorder="0"></iframe>
+		</div>
+
+
+
+    </ul> <!--responds to tab ul -->
+
+</div>
+
+
+
+
+<script>
+    function toggle(vis1, vis2) {
+      //console.log('Button clicked!');
+      var visspace1 = document.getElementById(vis1);
+      var visspace2 = document.getElementById(vis2);
+      visspace1.style.display = visspace1.style.display == 'none' ? '' : 'none'; //if none, display, if not none -> none
+      visspace2.style.display = visspace2.style.display == '' ? 'none' : 'none'; //dont display other one!
+    }
+</script>
+
+
+<script>
+    var btn = document.getElementById('myButton');
+    btn.addEventListener('click', loadProgress);
+
+    function loadProgress() {
+    //console.log('Button clicked!');
+    var progressBar = document.getElementsByClassName('progress-bar')[0];
+    var interval = 30;
+    var currentValue = 0;
+    for (var i = 0; i < 100; i += interval) {
+      //console.log('Setting interval', i)
+      setTimeout(function() {
+        currentValue += i;
+        //console.log('Setting progress width to:', currentValue, '%');
+        progressBar.setAttribute('style', 'width: ' + currentValue + '%');
+      }, i);
+    }
+    }
+</script>
+
+
+{% endblock %}
