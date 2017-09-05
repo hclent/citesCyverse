@@ -13,14 +13,15 @@ api = ProcessorsAPI(port=4848, jar_path=path, keep_alive=False, jvm_mem="-Xmx500
 rando_doc = api.bionlp.annotate("The mitochondria is the powerhouse of the cell.")
 
 folder = "/home/hclent/tmp/citesCyverse"
-pmcids = [f.strip('.txt') for f in os.listdir(folder) if not f.startswith('.app') and f.endswith('.txt')]
-print(pmcids)
+pmcids = [re.sub('\.txt','', f)  for f in os.listdir(folder) if not f.startswith('.app') and f.endswith('.txt')]
+#print(pmcids)
 print(len(pmcids))
-#keep_pmcids = [p for p in pmcids if not os.path.isfile(str(p)+".json") ]
+keep_pmcids = [p for p in pmcids if not os.path.isfile(str(p)+".json") ]
+print(len(keep_pmcids))
 
 docs = []
 
-for pmcid in pmcids:
+for pmcid in keep_pmcids:
     txt = pmcid + ".txt"
     filename = os.path.join(folder, txt)
     docdict = {"pmcid": pmcid, "filepath": filename}
@@ -44,6 +45,7 @@ def preProcessing(text):
 
 def loadDocuments(doc):
     #a doc is a dict {"pmcid": 1234, "filename": /path/to/file/name}
+    #print(type(doc))
     pmcid = doc["pmcid"]
     filepath = doc["filepath"]
 
@@ -86,11 +88,12 @@ def loadDocuments(doc):
 
 
 def multiprocess(docs):
+    t1 = time.time()
     if len(docs) == 0: #if there are no docs, abort
         logging.info("no documents to annotate")
         pass
     else:
-        t1 = time.time()
+        #t1 = time.time()
         pool = Pool(75)
         logging.debug('created worker pools')
         results = pool.map_async(loadDocuments, docs) #docs = ['17347674_1.txt', '17347674_2.txt', '17347674_3.txt', ...]
@@ -116,8 +119,8 @@ def multiprocess(docs):
     logging.info('Finished')
 
 
-#docs10 = docs[25:30] #FAILED
-#docs10 = docs[:10]
+
+#print(type(docs10))
 #print(docs10)
-#docs10 = [{"pmcid": "10.1007.978-1-4939-2175-1_12", "filepath": "/home/hclent/tmp/citesCyverse/10.1007.978-1-4939-2175-1_12.txt" }]
+
 multiprocess(docs)
