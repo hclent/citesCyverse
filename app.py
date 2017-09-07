@@ -36,14 +36,14 @@ def blah():
 
 @app.route("/cy-journals/")
 def cyJournals():
-    filename = "/path/to/journals/vis"
-    # with open(filename) as f:
-    #     journals = json.load(f)
+    filename = "/Users/heather/Desktop/citesCyverse/static/journalsvis.json"
+    with open(filename) as f:
+        journals = json.load(f)
     s_year = "2010" #start
     e_year = "2018" #end
-    unique_pubs = "760"
-    unique_journals = "200" #needs to be updated
-    journals = {}
+    unique_pubs = "753"
+    unique_journals = "467" #needs to be updated
+    #journals = {}
     return render_template("journals.html", journals=journals, unique_pubs=unique_pubs,
                            unique_journals=unique_journals, s_year=s_year, e_year=e_year)
 
