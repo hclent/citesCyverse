@@ -45,10 +45,12 @@ def concat_lemma_nes_samples():
 	#all_nes_samples = []
 
 	for lf in lemma_files:
+		print(lf)
 		with open(lf, 'rb') as f:
 			lemma_list = pickle.load(f)
 		for ls in lemma_list:
 			all_lemma_samples.append(ls)
+			print("data appended to all_lemma_samples")
 
 		# with open(nes_file, 'rb') as f2:
 		# 	nes_list = pickle.load(f2)
@@ -73,7 +75,7 @@ def concat_lemma_nes_samples():
 
 
 
-#concat_lemma_nes_samples()
+concat_lemma_nes_samples()
 
 
 def load_lemma_cache():

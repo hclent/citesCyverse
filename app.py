@@ -2,12 +2,12 @@ from flask import Flask, render_template, request, flash, url_for, redirect, ses
 from flask_wtf import Form
 from wtforms import TextField, SelectField
 import pickle, os.path, json
-#from werkzeug.serving import run simple
+#from werkzeug.serving import run_simple
 from processors import *
 
 #TODO: fix hard-coded paths
 
-app=Flask(__name__, static_url_path='/Users/heather/Desktop/citesCyverse/static')
+app=Flask(__name__, static_url_path='/Users/heather/Desktop/citesCyverse/static',  template_folder='templates')
 
 #Form for Topic Modeling
 class visOptions(Form):
@@ -25,7 +25,12 @@ class nesOptions(Form):
 
 
 @app.route("/home/")
-def citesCyverse():
+def homeCyverse():
+    return render_template("dashboard.html")
+
+
+@app.route("/blah/")
+def blah():
     return render_template("dashboard.html")
 
 

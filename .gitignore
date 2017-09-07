@@ -3,6 +3,7 @@
 *.png
 *.cfg
 *.csv
+*.tsv
 *.txt
 *.json
 *.pk

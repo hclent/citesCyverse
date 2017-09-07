@@ -53,7 +53,7 @@ def makeWords():
 
 		words.append(doc_words)
 
-	with open("words.pk", "wb") as p:
+	with open("texts.pk", "wb") as p:
 		pickle.dump(words, p)
 
 		
@@ -66,7 +66,11 @@ def load_model(file):
 def makeVecs():
 	vecs = {}
 
-	model = load_model("17kmodel.vec")
+	#model = load_model("17kmodel.vec")
+	model = load_model("cyverseMmodel.vec")
+
+	oov = 0
+	not_oov = 0
 
 	file_list = getFiles()
 	for fi in file_list:
@@ -84,19 +88,23 @@ def makeVecs():
 				try:
 					np_vec = model[word] #(100,)
 					vecs[word] = np_vec
+					not_oov += 1
 				except Exception as e:
-					#print(e)
-					print("OOV")
 					zeroes = [0.0] * 100
 					empty_vec = np.asarray(zeroes).T #init empty column vector (100,)
-					print(empty_vec.size())
 					vecs[word] = empty_vec
+					oov += 0
 
-	with open("vectors.pk", "wb") as p:
+	with open("wordvec.pk", "wb") as p:
 		pickle.dump(vecs, p)
 
+	print("NOT OOV: " + str(not_oov))
+	print("OOV: " + str(oov))
 
-makeWords()
-makeVecs()
-print("printed!")
+
+# makeWords()
+# print("done with words")
+# makeVecs()
+# print("done with vecs")
+# print("printed!")
 
