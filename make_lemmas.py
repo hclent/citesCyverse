@@ -75,11 +75,11 @@ def concat_lemma_nes_samples():
 
 
 
-concat_lemma_nes_samples()
+#concat_lemma_nes_samples()
 
 
 def load_lemma_cache():
-	l_name =  os.path.join(path_to_lemmas, "cyverse_lemmas.pickle")
+	l_name =  os.path.join(path_to_lemmas, "cyverse_lemmas_ALL.pickle")
 	with open(l_name, "rb") as qlemma:
 		lemma_samples = pickle.load(qlemma)
 	return lemma_samples
