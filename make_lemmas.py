@@ -135,20 +135,24 @@ def lemma_samples_by_year():
 		json_file = 'lemma_samples_' + str(json_file)
 		load_file = os.path.join(path_to_lemmas , json_file)
 
-		#if year == 2010 or year == 2011 or year == 2012 or year == 2013:
-		#	try:
-		#		with open(load_file, 'rb') as f:
-		#			lemma_list = pickle.load(f)
-		#			print(str(year) + ": " + str(f))
-		#		for ls in lemma_list:
-		#			lemma_samples_2010_13.append(ls)
-		#	except Exception as e:
-		#		print(e)
-		if year == 2014 or year ==2015 or year == 2016 or year == 2017:
-			with open(load_file, 'rb') as f:
-				lemma_list = pickle.load(f)
-			for ls in lemma_list:
-				lemma_samples_2014_17.append(ls)
+		# if year == 2010 or year == 2011 or year == 2012 or year == 2013:
+		# 	try:
+		# 		with open(load_file, 'rb') as f:
+		# 			lemma_list = pickle.load(f)
+		# 			print(str(year) + ": " + str(f))
+		# 		for ls in lemma_list:
+		# 			lemma_samples_2010_13.append(ls)
+		# 	except Exception as e:
+		# 		print(e)
+
+		if year == 2014 or year == 2015 or year == 2016 or year == 2017:
+			try:
+				with open(load_file, 'rb') as f:
+					lemma_list = pickle.load(f)
+				for ls in lemma_list:
+					lemma_samples_2014_17.append(ls)
+			except Exception as e:
+				print(e)
 
 	#Print 2010-2013 lemma samples
 	#print("length of lemma_samples 2010-2013: " + str(len(lemma_samples_2010_13)))
@@ -163,16 +167,16 @@ def lemma_samples_by_year():
 	#print("2010-2013 dumped to pickle!")
 
 	# # Print 2014-2017 lemma samples
-	 print("length of lemma_samples 2014-2017: " + str(len(lemma_samples_2014_17)))
-	 set_of_lemmas_2017 = {json.dumps(d, sort_keys=True) for d in lemma_samples_2014_17}
-	 lemma_samples_2017 = [json.loads(t) for t in set_of_lemmas_2017]
-	 print("length of (unique) lemma_samples 2014-2017: " + str(len(lemma_samples_2017)))
+	print("length of lemma_samples 2014-2017: " + str(len(lemma_samples_2014_17)))
+	set_of_lemmas_2017 = {json.dumps(d, sort_keys=True) for d in lemma_samples_2014_17}
+	lemma_samples_2017 = [json.loads(t) for t in set_of_lemmas_2017]
+	print("length of (unique) lemma_samples 2014-2017: " + str(len(lemma_samples_2017)))
     #
 	# # Dump to pickle
-	 lemmas_2014_17 = os.path.join(path_to_lemmas, "cyverse_lemmas_2014_2017.pickle")
-	 with open(lemmas_2014_17, "wb") as fw:
-	 	pickle.dump(lemma_samples_2017, fw)
-	 print("2014-2017 dumped to pickle!")
+	lemmas_2014_17 = os.path.join(path_to_lemmas, "cyverse_lemmas_2014_2017.pickle")
+	with open(lemmas_2014_17, "wb") as fw:
+		pickle.dump(lemma_samples_2017, fw)
+	print("2014-2017 dumped to pickle!")
 
 
 
