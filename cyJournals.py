@@ -160,5 +160,5 @@ print(len(potential_journals_list)) #787
 combo = list(zip(potential_years_list, potential_journals_list)) #should be 1-1
 years_list, journals = clean_combo(combo)
 print(years_list)
-years_range = (2011, 2017) #CyVerse is 2011-2017; added extra yera to both side for padding. 
+years_range = (2010, 2017) #CyVerse is 2011-2017; added extra yera to both side for padding.
 journals_vis(years_range, years_list, journals)
