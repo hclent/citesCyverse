@@ -1,4 +1,4 @@
-import os.path, pickle, json
+import os.path, pickle, json, csv, re
 
 
 path_to_lemmas = "/Users/heather/Desktop/citesCyverse/lemmas"
@@ -34,9 +34,6 @@ def print_lemma_nes_samples(biodoc_data):
 		# print("nes_samples dumped to pickle")
 
 
-
-#print_lemma_nes_samples(biodoc_data)
-
 def concat_lemma_nes_samples():
 	lemma_files = [os.path.join(path_to_lemmas, f) for f in os.listdir(path_to_lemmas) if f.startswith('lemma_samples_')]
 	print("number of lemma_files: " + str(len(lemma_files)))
@@ -66,7 +63,7 @@ def concat_lemma_nes_samples():
 	# nes_samples = [json.loads(t) for t in set_of_nes]
 
 	# Dump to pickle
-	cyverse_lemmas = os.path.join(path_to_lemmas, "cyverse_lemmas.pickle")
+	cyverse_lemmas = os.path.join(path_to_lemmas, "cyverse_lemmas_ALL.pickle")
 	with open(cyverse_lemmas, "wb") as qlcn:
 		pickle.dump(lemma_samples, qlcn)
 
@@ -90,11 +87,99 @@ def load_lemma_cache():
 # print(len(ls))
 
 
+#Going to make a lemma_samples for 2010-2013 and 2014-2017
+def lemma_samples_by_year():
+	# step 1: extract years and journals from the spreadsheet
+	potential_years_list = []
+	potential_filename_list = []
 
-# def load_nes_cache(query):
-# 	n_name = os.path.join(path_to_lemmas, "cyverse_nes.pickle")
+	with open('spreadsheet.tsv', 'r') as tsvin:
+		tsv = csv.reader(tsvin, delimiter='\t')
+
+		for row in tsv:
+			try:
+				year = (row[4])
+				potential_years_list.append(year)
+			except Exception as e1:
+				# no year
+				pass
+			try:
+				filename = (row[10])
+				potential_filename_list.append(filename)
+			except Exception as e2:
+				# no filename
+				pass
+
+	# step 2: clean the data (empty lines or filenames without years)
+	combo = list(zip(potential_years_list, potential_filename_list))
+	keep_combo = []  # 753
+	for c in combo:
+		possible_year = c[0]
+		possible_file = c[1]
+		# MUST have a year AND a not-blank journal
+		year = re.search('\d{4}', possible_year)
+		if year and possible_file.endswith('.txt'):  # possible_journal must not be empty
+			y = int(year.group(0))
+			f = str(possible_file)
+			tup = (y, f)
+			keep_combo.append(tup)
+	print(keep_combo[:10])
 
 
-# 		with open(n_name, "rb") as qnes:
-# 			nes_samples = pickle.load(qnes)
-# 	return nes_samples
+	lemma_samples_2010_13 = []
+	lemma_samples_2014_17 = []
+	for k in keep_combo:
+		year = k[0]
+		file = k[1]
+		json_file = re.sub('\.txt', '.pickle', file)
+		json_file = 'lemma_samples_' + str(json_file)
+		load_file = os.path.join(path_to_lemmas , json_file)
+
+		if year == 2010 or year == 2011 or year == 2012 or year == 2013:
+			try:
+				with open(load_file, 'rb') as f:
+					lemma_list = pickle.load(f)
+					print(str(year) + ": " + str(f))
+				for ls in lemma_list:
+					lemma_samples_2010_13.append(ls)
+			except Exception as e:
+				print(e)
+		# if year == 2014 or 2015 or 2016 or 2017:
+		# 	with open(load_file, 'rb') as f:
+		# 		lemma_list = pickle.load(f)
+		# 	for ls in lemma_list:
+		# 		lemma_samples_2014_17.append(ls)
+
+	#Print 2010-2013 lemma samples
+	print("length of lemma_samples 2010-2013: " + str(len(lemma_samples_2010_13)))
+	set_of_lemmas_2013 = {json.dumps(d, sort_keys=True) for d in lemma_samples_2010_13}
+	lemma_samples_2013 = [json.loads(t) for t in set_of_lemmas_2013]
+	print("length of (unique) lemma_samples 2010-2013: " + str(len(lemma_samples_2013)))
+
+	# Dump to pickle
+	lemmas_2010_13 = os.path.join(path_to_lemmas, "cyverse_lemmas_2010_2013.pickle")
+	with open(lemmas_2010_13, "wb") as fw:
+		pickle.dump(lemma_samples_2013, fw)
+	print("2010-2013 dumped to pickle!")
+
+	# # Print 2014-2017 lemma samples
+	# print("length of lemma_samples 2014-2017: " + str(len(lemma_samples_2014_17)))
+	# set_of_lemmas_2017 = {json.dumps(d, sort_keys=True) for d in lemma_samples_2014_17}
+	# lemma_samples_2017 = [json.loads(t) for t in set_of_lemmas_2017]
+	# print("length of (unique) lemma_samples 2014-2017: " + str(len(lemma_samples_2017)))
+    #
+	# # Dump to pickle
+	# lemmas_2014_17 = os.path.join(path_to_lemmas, "cyverse_lemmas_2014_2017.pickle")
+	# with open(lemmas_2014_17, "wb") as fw:
+	# 	pickle.dump(lemma_samples_2017, fw)
+	# print("2014-2017 dumped to pickle!")
+
+
+
+
+
+
+
+lemma_samples_by_year()
+
+
