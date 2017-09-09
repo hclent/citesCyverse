@@ -149,6 +149,7 @@ def lemma_samples_by_year():
 			try:
 				with open(load_file, 'rb') as f:
 					lemma_list = pickle.load(f)
+					print(str(year) + ": " + str(f))
 				for ls in lemma_list:
 					lemma_samples_2014_17.append(ls)
 			except Exception as e:
