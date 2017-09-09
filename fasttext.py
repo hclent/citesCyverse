@@ -31,8 +31,8 @@ def flatten(listOfLists):
 #TODO: update this to use the config file to point to lemma samples
 #Input: query
 #Output, list of words, and corresponding list of tags
-def get_words_tags():
-    path_to_lemma_samples = "/Users/heather/Desktop/citesCyverse/lemmas/cyverse_lemmas.pickle"
+def get_words_tags(path_to_lemma_samples):
+    #path_to_lemma_samples = "/Users/heather/Desktop/citesCyverse/lemmas/cyverse_lemmas_ALL.pickle"
 
     with open(path_to_lemma_samples, "rb") as file:
         lemma_samples = pickle.load(file)
