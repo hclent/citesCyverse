@@ -22,18 +22,18 @@ Step 4:
 Step 5:
     cluster
 '''
+cyverse_stop_words = ['university', '%', 'table', 'figure', '\\u', '\\\\', '\\', 'author', 'publication', 'appendix',
+                      'table', 'author', 'skip', 'main', ]
+
 
 
 def flatten(listOfLists):
     return list(chain.from_iterable(listOfLists))
 
 
-#TODO: update this to use the config file to point to lemma samples
-#Input: query
+#Input: path to the file to use.
 #Output, list of words, and corresponding list of tags
 def get_words_tags(path_to_lemma_samples):
-    #path_to_lemma_samples = "/Users/heather/Desktop/citesCyverse/lemmas/cyverse_lemmas_ALL.pickle"
-
     with open(path_to_lemma_samples, "rb") as file:
         lemma_samples = pickle.load(file)
 
@@ -80,7 +80,15 @@ def transform_text(words, tags):
                 np_stack = []
             # append current token
             transformed_tokens.append(w)
-    return transformed_tokens
+    #Cleaning the text :/ sorta hacky, sorry
+    keep_transformed_tokens = []
+    for t in transformed_tokens:
+        for w in cyverse_stop_words:
+            if not t.startswith(w) and w not in t.split(' '):
+                keep_transformed_tokens.append(t)
+            # if t.startswith(w) and w in t.split(' '):
+            #     print(t)
+    return keep_transformed_tokens
 
 
 

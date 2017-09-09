@@ -20,28 +20,31 @@ from fgraph2json import embedding_json
 
 #TODO: where to put better text pre-processing?
 path_to_lemma_samples = "/Users/heather/Desktop/citesCyverse/lemmas/cyverse_lemmas_ALL.pickle"
+path_to_early = "/home/hclent/tmp/citesCyverse/lemmas/cyverse_lemmas_2010_2013.pickle"
+path_to_later = "/home/hclent/tmp/citesCyverse/lemmas/cyverse_lemmas_2014_2017.pickle"
 
 #Get fasttexts vecs
-flat_words, flat_tags = get_words_tags(path_to_lemma_samples)
+flat_words, flat_tags = get_words_tags(path_to_early)
 xformed_tokens = transform_text(flat_words, flat_tags)
 npDict = chooseTopNPs(xformed_tokens)
-print("LEN NPDICT BEFORE FILTERING: " + str(len(npDict.keys()))) #There are 249,199 noun phrases in the 760 documents
+#print("LEN NPDICT BEFORE FILTERING: " + str(len(npDict.keys()))) #There are 249,199 noun phrases in the 760 documents
 
 ### OPTIONAL FILTER npDICT ####
-top = list(npDict.most_common(3000))
-other_top = list(npDict.most_common(3100))
+top = list(npDict.most_common(1000))
+other_top = list(npDict.most_common(1100))
 keep_top = [item for item in other_top if item not in top]
 
 '''
+for ALL 
 count=1 under the top 30,000/249199 NPs. :/
 At the 10 k range,  the words are about 4 frequency 
 # BREAKING THE LEMMA SAMPLES BY DATE MIGHT MAKE THE TOPICS BETTER :D 
 Above 4k the results aren't looking terrible and the counts are at 7
 '''
 
-# ######
+# # ######
 model = load_model("17kmodel.vec")
-matrix = getNPvecs(top, model) #top or npDict can go here
+matrix = getNPvecs(keep_top, model) #top or npDict can go here
 
 #do kmeans
 kmeans = KMeans(n_clusters=20, random_state=2).fit(matrix)
@@ -80,6 +83,8 @@ favorite_results = [
 (18, ('venom composition', 6)), (18, ('venom potency', 4)), (18, ('venom transmission system', 3)),
 (19, ('bone colonization', 9)), (19, ('bone fragment', 6)), (19, ('bone microenvironment', 4)), (19, ('bone lesion', 4)), (19, ('metastasis model', 3)), (19, ('bone fragment drug concentration', 3)), (19, ('bone segment', 2)), (19, ('bone tissue', 2)),
 (20, ('coral sponge', 9)), (20, ('sea anemone', 7)), (20, ('seawater sample', 5)), (20, ('sea water', 3)), (20, ('coral density', 3)), (20, ('coral reef', 3)), (20, ('sediment m. griffithsi.', 2)), (20, ('sea canyon', 2)), (20, ('coral habitat', 2)), (20, ('sea pen', 2)), (20, ('submarine canyon', 2)), (20, ('sea ice', 2)), (20, ('nematocyst diversity', 2))]
+
+
 #embedding_json(favorite_results, query, 20, '10kFAV')
 #print("made results!!")
 #(20, ('coral sponge', 9)), (20, ('sea anemone', 7)), (20, ('seawater sample', 5)), (20, ('sea water', 3)), (20, ('coral density', 3)), (20, ('coral reef', 3)), (20, ('sediment m. griffithsi.', 2)), (20, ('sea canyon', 2)), (20, ('coral habitat', 2)), (20, ('sea pen', 2)), (20, ('submarine canyon', 2)), (20, ('sea ice', 2)), (20, ('nematocyst diversity', 2))
