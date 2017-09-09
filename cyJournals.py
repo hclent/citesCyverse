@@ -1,5 +1,4 @@
-import re, operator, collections, json, csv
-from itertools import chain
+import re, operator, json, csv
 from collections import defaultdict
 
 
