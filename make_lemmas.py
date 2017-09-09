@@ -1,8 +1,8 @@
 import os.path, pickle, json, csv, re
 
 
-path_to_lemmas = "/Users/heather/Desktop/citesCyverse/lemmas"
-
+#path_to_lemmas = "/Users/heather/Desktop/citesCyverse/lemmas"
+path_to_lemmas = "/home/hclent/tmp/citesCyverse/lemmas"
 
 def print_lemma_nes_samples(biodoc_data):
 	lemma_samples = []
