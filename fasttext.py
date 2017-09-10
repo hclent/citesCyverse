@@ -38,27 +38,45 @@ def get_words_tags(path_to_lemma_samples):
         lemma_samples = pickle.load(file)
 
     words = [l[1] for l in lemma_samples]
-
     flat_words = flatten(words)
 
     tags = [l[2] for l in lemma_samples]
     flat_tags = flatten(tags)
 
+    keep_words = []
+    keep_tags = []
+
+    for c in list(zip(flat_words, flat_tags)):
+        w = c[0]
+        tag = c[1]
+        if w not in cyverse_stop_words:
+            keep_words.append(w)
+            keep_tags.append(tag)
+
+
+    #print(keep_words[0:100])
+    #print(keep_tags[0:100])
+
     word_length = len(flat_words)
     tag_length = len(flat_tags)
 
+    filtered_words_len = len(keep_words)
+    #print(filtered_words)
+    filtered_tags_len = len(keep_tags)
+    #print(filtered_tags)
+
     # It SHOULD NOT happen that the tags and words are not the same length...
     # But JUST IN CASE.... force them to have the same length
-    if word_length != tag_length:
+    if filtered_words_len != filtered_tags_len:
         #print("they aren't the same :(( ")
-        if word_length > tag_length:
+        if filtered_words_len > filtered_tags_len:
             #shorten word_length
-            flat_words = flat_words[:tag_length]
-        elif tag_length > word_length:
+            keep_words = keep_words[:filtered_tags_len]
+        elif filtered_tags_len > filtered_words_len:
             #shorten tag_length
-            flat_tags = flat_tags[:word_length]
+            keep_tags = keep_tags[:filtered_words_len]
 
-    return flat_words, flat_tags
+    return keep_words, keep_tags
 
 
 
