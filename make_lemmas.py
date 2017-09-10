@@ -137,13 +137,17 @@ def lemma_samples_by_year():
 		load_file = os.path.join(path_to_lemmas , json_file)
 
 
+		'''
+		TODO: do we do for l in lemma_list append, or just append the lemma_list?
+		'''
 		if year in range(2010, 2013 + 1):
 			try:
 				with open(load_file, 'rb') as f:
 					lemma_list = pickle.load(f)
 				i += 1
 				print(str(year) + ": " + str(f))
-				lemma_samples_2010_13.append(lemma_list)
+				for l in lemma_list:
+					lemma_samples_2010_13.append(l)
 			except Exception as e:
 				print(e)
 
@@ -184,6 +188,6 @@ def lemma_samples_by_year():
 	# print("2014-2017 dumped to pickle!")
 
 
-lemma_samples_by_year()
+#lemma_samples_by_year()
 
 
