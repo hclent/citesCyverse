@@ -20,8 +20,8 @@ from fgraph2json import embedding_json
 
 #TODO: where to put better text pre-processing?
 path_to_lemma_samples = "/Users/heather/Desktop/citesCyverse/lemmas/cyverse_lemmas_ALL.pickle"
-path_to_early = "/home/hclent/tmp/citesCyverse/lemmas/cyverse_lemmas_2010_2013.pickle"
-path_to_later = "/home/hclent/tmp/citesCyverse/lemmas/cyverse_lemmas_2014_2017.pickle"
+path_to_early = "/home/hclent/tmp/citesCyverse/lemmas/cyverse_lemmas_2010_2013.pickle" #made with for ls in lemma_samples .append(ls)
+path_to_later = "/home/hclent/tmp/citesCyverse/lemmas/cyverse_lemmas_2014_2017.pickle" #made with .append(lemma_samples)
 
 #Get fasttexts vecs
 flat_words, flat_tags = get_words_tags(path_to_early)
@@ -30,8 +30,8 @@ npDict = chooseTopNPs(xformed_tokens)
 #print("LEN NPDICT BEFORE FILTERING: " + str(len(npDict.keys()))) #There are 249,199 noun phrases in the 760 documents
 
 ### OPTIONAL FILTER npDICT ####
-top = list(npDict.most_common(1000))
-other_top = list(npDict.most_common(1100))
+top = list(npDict.most_common(300))
+other_top = list(npDict.most_common(400))
 keep_top = [item for item in other_top if item not in top]
 
 '''

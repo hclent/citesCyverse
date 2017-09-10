@@ -23,7 +23,8 @@ Step 5:
     cluster
 '''
 cyverse_stop_words = ['university', '%', 'table', 'figure', '\\u', '\\\\', '\\', 'author', 'publication', 'appendix',
-                      'table', 'author', 'skip', 'main', ]
+                      'table', 'author', 'skip', 'main', '.', 'title', 'u2009', 'publisher',
+                      'www.plantphysiol.org', 'copyright', 'san diego', 'california']
 
 
 
@@ -75,7 +76,6 @@ def get_words_tags(path_to_lemma_samples):
         elif filtered_tags_len > filtered_words_len:
             #shorten tag_length
             keep_tags = keep_tags[:filtered_words_len]
-
     return keep_words, keep_tags
 
 
