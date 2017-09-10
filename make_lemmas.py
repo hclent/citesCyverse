@@ -45,9 +45,9 @@ def concat_lemma_nes_samples():
 		print(lf)
 		with open(lf, 'rb') as f:
 			lemma_list = pickle.load(f)
-		for ls in lemma_list:
-			all_lemma_samples.append(ls)
-			print("data appended to all_lemma_samples")
+		#append the entire list [id, [words], [tags]]
+		all_lemma_samples.append(lemma_list)
+		print("data appended to all_lemma_samples")
 
 		# with open(nes_file, 'rb') as f2:
 		# 	nes_list = pickle.load(f2)
@@ -139,53 +139,51 @@ def lemma_samples_by_year():
 
 		if year in range(2010, 2013 + 1):
 			try:
-				# with open(load_file, 'rb') as f:
-				# 	lemma_list = pickle.load(f)
+				with open(load_file, 'rb') as f:
+					lemma_list = pickle.load(f)
 				i += 1
-				# print(str(year) + ": " + str(f))
-				# for ls in lemma_list:
-				# 	lemma_samples_2010_13.append(ls)
+				print(str(year) + ": " + str(f))
+				lemma_samples_2010_13.append(lemma_list)
 			except Exception as e:
 				print(e)
 
 		if year in range(2014, 2018):
 			j += 1
-			try:
-				with open(load_file, 'rb') as f:
-					lemma_list = pickle.load(f)
-					print(str(year) + ": " + str(f))
-				for ls in lemma_list:
-					lemma_samples_2014_17.append(ls)
-			except Exception as e:
-				print(e)
+			# try:
+			# 	with open(load_file, 'rb') as f:
+			# 		lemma_list = pickle.load(f)
+			# 		print(str(year) + ": " + str(f))
+			# 		lemma_samples_2014_17.append(lemma_list)
+			# except Exception as e:
+			# 	print(e)
 
 	#Print 2010-2013 lemma samples
 	print("EARLY: " + str(i))
 	print("LATER: " + str(j))
-	# print("length of lemma_samples 2010-2013: " + str(len(lemma_samples_2010_13)))
-	# set_of_lemmas_2013 = {json.dumps(d, sort_keys=True) for d in lemma_samples_2010_13}
-	# ls_2010_13 = [json.loads(t) for t in set_of_lemmas_2013]
-	# print("length of (unique) lemma_samples 2010-2013: " + str(len(ls_2010_13)))
-    # #
-	# # Dump to pickle
-	# lemmas_2010_13 = os.path.join(path_to_lemmas, "cyverse_lemmas_2010_2013.pickle")
-	# with open(lemmas_2010_13, "wb") as fw:
-	# 	pickle.dump(ls_2010_13, fw)
-	# print("2010-2013 dumped to pickle!")
+	print("length of lemma_samples 2010-2013: " + str(len(lemma_samples_2010_13)))
+	set_of_lemmas_2013 = {json.dumps(d, sort_keys=True) for d in lemma_samples_2010_13}
+	ls_2010_13 = [json.loads(t) for t in set_of_lemmas_2013]
+	print("length of (unique) lemma_samples 2010-2013: " + str(len(ls_2010_13)))
+    #
+	# Dump to pickle
+	lemmas_2010_13 = os.path.join(path_to_lemmas, "cyverse_lemmas_2010_2013.pickle")
+	with open(lemmas_2010_13, "wb") as fw:
+		pickle.dump(ls_2010_13, fw)
+	print("2010-2013 dumped to pickle!")
 
 	# # Print 2014-2017 lemma samples
-	print("length of lemma_samples 2014-2017: " + str(len(lemma_samples_2014_17)))
-	set_of_lemmas_2017 = {json.dumps(d, sort_keys=True) for d in lemma_samples_2014_17}
-	ls_2017 = [json.loads(t) for t in set_of_lemmas_2017]
-	print("length of (unique) lemma_samples 2014-2017: " + str(len(ls_2017)))
-    #
-	# # Dump to pickle
-	lemmas_2014_17 = os.path.join(path_to_lemmas, "cyverse_lemmas_2014_2017.pickle")
-	with open(lemmas_2014_17, "wb") as fw:
-		pickle.dump(ls_2017, fw)
-	print("2014-2017 dumped to pickle!")
+	# print("length of lemma_samples 2014-2017: " + str(len(lemma_samples_2014_17)))
+	# set_of_lemmas_2017 = {json.dumps(d, sort_keys=True) for d in lemma_samples_2014_17}
+	# ls_2017 = [json.loads(t) for t in set_of_lemmas_2017]
+	# print("length of (unique) lemma_samples 2014-2017: " + str(len(ls_2017)))
+    # #
+	# # # Dump to pickle
+	# lemmas_2014_17 = os.path.join(path_to_lemmas, "cyverse_lemmas_2014_2017.pickle")
+	# with open(lemmas_2014_17, "wb") as fw:
+	# 	pickle.dump(ls_2017, fw)
+	# print("2014-2017 dumped to pickle!")
 
 
-#lemma_samples_by_year()
+lemma_samples_by_year()
 
 
