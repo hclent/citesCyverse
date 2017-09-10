@@ -1,7 +1,7 @@
 import json, re, os.path
 from operator import itemgetter
 
-def embedding_json(results, query, k, top_n):
+def embedding_json(results, query, k, top_n, year):
     json_out = {"nodes": [], "links": []}
     for r1 in results:
         g1 = int(r1[0])
@@ -26,7 +26,7 @@ def embedding_json(results, query, k, top_n):
     print_json = {"nodes": ordered_nodes, "links": links}
 
     save_path = "/Users/heather/Desktop/citesCyverse/static/fgraphs"
-    filename =  'fgraph_' + str(query) + '_' + str(k) + '_' + str(top_n) + '.json'
+    filename =  'fgraph_' + str(query) + '_' + str(k) + '_' + str(top_n) + '_' +str(year) +'.json'
 
     completeName = os.path.join(save_path, filename)  # with the query for a name
 
