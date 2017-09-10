@@ -65,6 +65,8 @@ def cyWordcloud():
     return render_template("wordcloud.html")
 
 
+#TODO: Needs better filtering of cyverse-specific/publication stopwords ("figure", "table") etc.
+#TODO: need to decide what the bins will be here for top NPs (only the top 400 is probably not ideal)
 @app.route("/cy-embeddings/", methods=["GET","POST"])
 def cyEmbeddings():
     query = "cyverse"
@@ -105,10 +107,8 @@ def cyEmbeddings():
             flat_words, flat_tags = get_words_tags(load_file)
             logging.info(" extracting NounPhrases ... ")
             xformed_tokens = transform_text(flat_words, flat_tags)
-            #TODO: Needs better filtering of cyverse-specific/publication stopwords ("figure", "table") etc.
             npDict = chooseTopNPs(xformed_tokens)
 
-            #TODO: need to decide what the bins will be here for top NPs
             #top 100,200,300,400,500,1000,5000,10000, 25000, ??
             ### OPTIONAL FILTER npDICT ####
             if window == 100:
