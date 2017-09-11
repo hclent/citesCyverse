@@ -97,8 +97,8 @@ def makeVecs():
 					vecs[word] = empty_vec
 					oov += 0
 
-	#should be named wordvec.pk for sHDP
-	with open("wordvecDict.pickle", "wb") as p:
+	#wordvec.pk for sHDP
+	with open("wordvec.pk", "wb") as p:
 		pickle.dump(vecs, p)
 
 	print("NOT OOV: " + str(not_oov))
