@@ -62,7 +62,10 @@ def cyJournals():
 #Maybe use TF-IDF to filter words instead of most frequent?
 @app.route("/cy-wordcloud/")
 def cyWordcloud():
-    return render_template("wordcloud.html")
+    filename = "/Users/heather/Desktop/citesCyverse/static/wordclouds/ocean.json"
+    with open(filename, "r") as f:
+        wordcloud_data = json.load(f)
+    return render_template("wordcloud.html", wordcloud_data=wordcloud_data)
 
 
 #TODO: Needs better filtering of cyverse-specific/publication stopwords ("figure", "table") etc.
