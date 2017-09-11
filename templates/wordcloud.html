@@ -53,8 +53,9 @@
 </body>
 <script>
     var fill = d3.scale.category20();
-myjson = {{ wordcloud_data|tojson }};
-var frequency_list = JSON.parse( myjson );
+//myjson = {{ wordcloud_data|tojson }};
+var frequency_list = {{ wordcloud_data|tojson }};
+//var frequency_list = JSON.parse( myjson );
 
   d3.layout.cloud().size([800, 800])
       .words(frequency_list)

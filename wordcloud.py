@@ -10,13 +10,13 @@ from fasttext import load_model
 model = load_model("17kmodel.vec")
 
 
-# vectors_dict = "/Users/heather/Desktop/citesCyverse/wordvecDict.pickle"
-# path_to_lemma_samples = "/Users/heather/Desktop/citesCyverse/lemmas"
-# path_to_wordcloud = "/Users/heather/Desktop/citesCyverse/static/wordclouds"
+vectors_dict = "/Users/heather/Desktop/citesCyverse/wordvecDict.pickle"
+path_to_lemma_samples = "/Users/heather/Desktop/citesCyverse/lemmas"
+path_to_wordcloud = "/Users/heather/Desktop/citesCyverse/static/wordclouds"
 
-vectors_dict = "/home/hclent/tmp/citesCyverse/wordvecDict.pickle"
-path_to_lemma_samples = "/home/hclent/tmp/citesCyverse/lemmas"
-path_to_wordcloud = "/home/hclent/tmp/citesCyverse/static/wordclouds"
+#vectors_dict = "/home/hclent/tmp/citesCyverse/wordvecDict.pickle"
+#path_to_lemma_samples = "/home/hclent/tmp/citesCyverse/lemmas"
+#path_to_wordcloud = "/home/hclent/tmp/citesCyverse/static/wordclouds"
 
 lemmas_samples_ALL = "cyverse_lemmas_ALL.pickle"
 
@@ -76,11 +76,14 @@ def wordcloud(query, nesDict, wordcloud_words):
         wordcloud_list.append(entry)
 
     wordcloud_json = json.dumps(wordcloud_list)
+    print(wordcloud_json)
 
     filename = query + ".json"
     path = os.path.join(path_to_wordcloud, filename)
+    print(path)
 
-    with open(path, "wb") as out:
+    #TODO: this is not dumping to json :/
+    with open(path) as out:
         json.dumps(wordcloud_json, out)
 
     return wordcloud_json
@@ -89,4 +92,4 @@ def wordcloud(query, nesDict, wordcloud_words):
 nesDict = frequency_dict("cyverse_lemmas_ALL.pickle")
 wordcloud_words = filter_by_embeddings("ocean", nesDict)
 print(wordcloud_words)
-wordcloud("ocean", nesDict, wordcloud_words)
+wordcloud_json = wordcloud("ocean", nesDict, wordcloud_words)
