@@ -12,7 +12,9 @@ import numpy as np
 
 tokenizer = RegexpTokenizer(r'\w+')
 eng_stopwords = nltk.corpus.stopwords.words('english')
-my_stopwords = ['abstract', 'background', 'methods', 'results', 'n']
+my_stopwords = ['abstract', 'background', 'methods', 'results', 'n', 'university', '%', 'table', 'figure', '\\u', '\\\\', '\\', 'author', 'publication', 'appendix',
+                      'table', 'author', 'skip', 'main', '.', 'title', 'u2009', 'publisher',
+                      'www.plantphysiol.org', 'copyright', 'san diego', 'california']
 for m in my_stopwords:
 	eng_stopwords.append(m)
 
@@ -66,8 +68,8 @@ def load_model(file):
 def makeVecs():
 	vecs = {}
 
-	#model = load_model("17kmodel.vec")
-	model = load_model("cyverseMmodel.vec")
+	model = load_model("17kmodel.vec")
+	#model = load_model("cyverseMmodel.vec")
 
 	oov = 0
 	not_oov = 0
@@ -95,7 +97,8 @@ def makeVecs():
 					vecs[word] = empty_vec
 					oov += 0
 
-	with open("wordvec.pk", "wb") as p:
+	#should be named wordvec.pk for sHDP
+	with open("wordvecDict.pickle", "wb") as p:
 		pickle.dump(vecs, p)
 
 	print("NOT OOV: " + str(not_oov))
