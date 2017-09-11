@@ -72,24 +72,29 @@ def wordcloud(query, nesDict, wordcloud_words):
     wordcloud_list = [] #will dump this to json
 
     for word in wordcloud_words:
-        entry = {"text": word, "size": nesDict[word]}
+        size = nesDict[word]
+        if size < 10:
+            entry = {"text": word, "size": 10}
+        else:
+            entry = {"text": word, "size": nesDict[word]}
         wordcloud_list.append(entry)
 
     wordcloud_json = json.dumps(wordcloud_list)
     print(wordcloud_json)
 
-    filename = query + ".json"
-    path = os.path.join(path_to_wordcloud, filename)
-    print(path)
+    # filename = query + ".json"
+    # path = os.path.join(path_to_wordcloud, filename)
+    #print(path)
 
-    #TODO: this is not dumping to json :/
-    with open(path) as out:
-        json.dumps(wordcloud_json, out)
+    # #TODO: this is not dumping to json :/
+    # with open(path) as out:
+    #     json.dumps(wordcloud_json, out)
 
     return wordcloud_json
 
 
 nesDict = frequency_dict("cyverse_lemmas_ALL.pickle")
-wordcloud_words = filter_by_embeddings("ocean", nesDict)
+wordcloud_words = filter_by_embeddings("disease", nesDict)
 print(wordcloud_words)
-wordcloud_json = wordcloud("ocean", nesDict, wordcloud_words)
+print("#"*20)
+wordcloud_json = wordcloud("disease", nesDict, wordcloud_words)
