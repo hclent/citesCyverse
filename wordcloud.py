@@ -4,14 +4,19 @@ from processors import *
 
 
 
-vectors_dict = "/Users/heather/Desktop/citesCyverse/wordvecDict.pickle"
-path_to_lemma_samples = "/Users/heather/Desktop/citesCyverse/lemmas"
-path_to_wordcloud = "/Users/heather/Desktop/citesCyverse/static/wordclouds"
-lemmas_samples_ALL = ""
+# vectors_dict = "/Users/heather/Desktop/citesCyverse/wordvecDict.pickle"
+# path_to_lemma_samples = "/Users/heather/Desktop/citesCyverse/lemmas"
+# path_to_wordcloud = "/Users/heather/Desktop/citesCyverse/static/wordclouds"
+
+vectors_dict = "/home/hclent/tmp/citesCyverse/wordvecDict.pickle"
+path_to_lemma_samples = "/home/hclent/tmp/citesCyverse/lemmas"
+path_to_wordcloud = "/home/hclent/tmp/citesCyverse/static/wordclouds"
+
+lemmas_samples_ALL = "cyverse_lemmas_ALL.pickle"
 
 cyverse_stop_words = ['university', '%', 'table', 'figure', '\\u', '\\\\', '\\', 'author', 'publication', 'appendix',
                       'table', 'author', 'skip', 'main', '.', 'title', 'u2009', 'publisher',
-                      'www.plantphysiol.org', 'copyright', 'san diego', 'california']
+                      'www.plantphysiol.org', 'copyright']
 
 #TODO: depending on year files
 #use train embeddings and do like "genetics cloud", "plant cloud", "ocean cloud", "animal cloud" ??
