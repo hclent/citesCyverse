@@ -1,1 +1,123 @@
-WORDS IN CLOUDS WILL GO HERE
+<html>
+<head>
+    <!--word cloud scripts -->
+    <script src="{{ url_for('static', filename='js/third-party/d3/d3.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/third-party/d3-cloud/build/d3.layout.cloud.js') }}"></script>
+
+    <!--bootstrap scripts -->
+     <link href= "{{ url_for('static',
+	filename='js/third-party/bootstrap/dist/css/bootstrap.min.css')}}" rel="stylesheet">
+
+    <script src="{{ url_for('static', filename='js/third-party/jquery/dist/jquery.min.js') }}"></script>
+	<script type="text/javascript" src="{{ url_for('static', filename='js/third-party/bootstrap/dist/js/bootstrap.min.js') }}"></script>
+
+    <style>
+    .form-check-inline { margin-right: 5px }
+    </style>
+
+
+</head>
+{{popup | safe}}
+<body>
+
+
+
+
+ <!-- Progress modal -->
+<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+        <h4 class="modal-title" id="myModalLabel">Loading</h4>
+      </div>
+      <div class="modal-body">
+
+				<!-- Progress bar that doesn't actually move -->
+				<div class="progress">
+				  <div class="progress-bar progress-bar-success progress-bar-striped active" role="progressbar" aria-valuenow="1" aria-valuemin="0" aria-valuemax="100" style="width: 45%">
+				    <span class="sr-only">45% Complete</span>
+				  </div>
+				</div>
+
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+</body>
+<script>
+    var fill = d3.scale.category20();
+myjson = {{ wordcloud_data|tojson }};
+var frequency_list = JSON.parse( myjson );
+
+  d3.layout.cloud().size([800, 800])
+      .words(frequency_list)
+      .rotate(function() { return ~~(Math.random() * 2) * 90; })
+      .font("Impact")
+      .fontSize(function(d) { return d.size; })
+      .on("end", draw)
+      .start();
+  function draw(words) {
+    d3.select("body").append("svg")
+        .attr("width", 800) //makes size of svg
+        .attr("height", 800)
+      .append("g")
+        .attr("transform", "translate(400,400)")//(L-R, up-down) (150,150 default) with 300,300 svg
+      .selectAll("text")
+        .data(words)
+      .enter().append("text")
+        .style("font-size", function(d) { return d.size + "px"; })
+        .style("font-family", "Impact")
+        .style("fill", function(d, i) { return fill(i); })
+        .attr("text-anchor", "middle")
+        .attr("transform", function(d) {
+          return "translate(" + [d.x, d.y] + ")rotate(" + d.rotate + ")";
+        })
+        .text(function(d) { return d.text; });
+  }
+</script>
+
+<script>
+  var btn = document.getElementById('wcButton');
+  btn.addEventListener('click', loadProgress);
+  function loadProgress() {
+    console.log('Button clicked!');
+    var progressBar = document.getElementsByClassName('progress-bar')[0];
+    var interval = 30;
+    var currentValue = 0;
+    for (var i = 0; i < 100; i += interval) {
+      console.log('Setting interval', i)
+      setTimeout(function() {
+        currentValue += i;
+        console.log('Setting progress width to:', currentValue, '%');
+        progressBar.setAttribute('style', 'width: ' + currentValue + '%');
+      }, i);
+    }
+  }
+</script>
+
+
+<script>
+  var btn = document.getElementById('wcButton');
+  btn.addEventListener('click', loadProgress);
+  function loadProgress() {
+    //console.log('Button clicked!');
+    var progressBar = document.getElementsByClassName('progress-bar')[0];
+    var interval = 30;
+    var currentValue = 0;
+    for (var i = 0; i < 100; i += interval) {
+      //console.log('Setting interval', i)
+      setTimeout(function() {
+        currentValue += i;
+        //console.log('Setting progress width to:', currentValue, '%');
+        progressBar.setAttribute('style', 'width: ' + currentValue + '%');
+      }, i);
+    }
+  }
+</script>
