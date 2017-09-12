@@ -92,8 +92,8 @@ def cyEmbeddings():
         years = str(form.y_years.data)
         logging.info(years)
 
-        path_to_lemma_samples = '/home/hclent/repos/citesCyverse/lemmas/'
-        path_to_fgraphs = '/home/hclent/repos/citesCyverse/static/fgraphs/'
+        path_to_lemma_samples = '/home/hclent/repos/citesCyverse/flask/lemmas/'
+        path_to_fgraphs = '/home/hclent/repos/citesCyverse/static/flask/fgraphs/'
 
         filename = 'fgraph_' + str(query) + '_' + str(k_clusters) + '_' + str(window) + '_' + str(years) + '.json'
 
