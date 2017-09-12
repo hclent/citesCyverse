@@ -84,13 +84,19 @@ def cyWordcloud():
         except Exception as e:
             logging.info("no file for this one...")
             logging.info("making nesDict .. ")
-            nesDict = frequency_dict("cyverse_lemmas_ALL.pickle")
-            wordcloud_words = filter_by_embeddings(searchWord, nesDict)
-            logging.info(wordcloud_words)
-            wordcloud_data = wordcloud(searchWord, nesDict, wordcloud_words)
-            #cache file
-            logging.info(type(wordcloud_data))
-            return render_template("wordcloud.html", wordcloud_data=wordcloud_data)
+
+            try:
+                blah = model[searchWord] #if it fails here, the word has no vector
+                nesDict = frequency_dict("cyverse_lemmas_ALL.pickle")
+                wordcloud_words = filter_by_embeddings(searchWord, nesDict)
+                logging.info(wordcloud_words)
+                wordcloud_data = wordcloud(searchWord, nesDict, wordcloud_words)
+                #cache file
+                logging.info(type(wordcloud_data))
+                return render_template("wordcloud.html", wordcloud_data=wordcloud_data)
+            except Exception as e2:
+                return("So sorry! The word " + str(searchWord) + " has no vector, so we can't generate a word cloud. Please refresh the page and try again!")
+
     else:
         wordcloud_data = [{"text": "predisposed", "size": 10}, {"text": "undiagnosed", "size": 10}, {"text": "fatal", "size": 13}, {"text": "manifestation", "size": 16}, {"text": "neurological", "size": 10}, {"text": "cure", "size": 25}, {"text": "disease.", "size": 10}, {"text": "symptomatology", "size": 10}, {"text": "development", "size": 3205}, {"text": "misdiagnosed", "size": 10}, {"text": "autoimmune", "size": 31}, {"text": "diagnose", "size": 44}, {"text": "disease", "size": 692}, {"text": "antecedent", "size": 10}, {"text": "disorder", "size": 72}, {"text": "asymptomatic", "size": 10}, {"text": "chronic", "size": 23}, {"text": "severity", "size": 84}, {"text": "diabetes", "size": 14}, {"text": "illness", "size": 10}, {"text": "pathotype", "size": 10}, {"text": "progression", "size": 59}, {"text": "superinfection", "size": 10}, {"text": "causative", "size": 15}, {"text": "cardiovascular", "size": 17}, {"text": "deteriorating", "size": 10}, {"text": "risk", "size": 301}, {"text": "pathological", "size": 20}, {"text": "deterioration", "size": 10}, {"text": "autoimmunity", "size": 20}, {"text": "neurodegenerative", "size": 10}, {"text": "devastating", "size": 10}, {"text": "preventable", "size": 10}, {"text": "neurologic", "size": 10}, {"text": "disability", "size": 10}, {"text": "dementia", "size": 10}, {"text": "management", "size": 2631}, {"text": "recurrence", "size": 10}, {"text": "suffering", "size": 10}, {"text": "causally", "size": 10}, {"text": "severe", "size": 100}, {"text": "clinically", "size": 10}, {"text": "diseased", "size": 26}, {"text": "pathogenesis", "size": 10}, {"text": "recurrent", "size": 25}, {"text": "patient", "size": 92}, {"text": "etiology", "size": 10}, {"text": "diagnosis", "size": 68}, {"text": "outcome", "size": 353}, {"text": "pathology", "size": 47}, {"text": "recurrently", "size": 10}, {"text": "malignancy", "size": 10}, {"text": "prevention", "size": 27}, {"text": "sclerosis", "size": 10}, {"text": "treat", "size": 261}, {"text": "systemic", "size": 76}, {"text": "symptomatic", "size": 10}, {"text": "clinical", "size": 146}, {"text": "disease-", "size": 10}, {"text": "asymptomatically", "size": 10}, {"text": "complication", "size": 30}, {"text": "pathophysiology", "size": 10}, {"text": "neurologically", "size": 10}, {"text": "susceptibility", "size": 70}, {"text": "progressive", "size": 31}, {"text": "predisposition", "size": 10}, {"text": "early-onset", "size": 10}, {"text": "threatening", "size": 10}, {"text": "ulcerative", "size": 10}, {"text": "late-onset", "size": 10}, {"text": "incidence", "size": 37}, {"text": "disease-resistance", "size": 10}, {"text": "early-stage", "size": 10}, {"text": "prevalence", "size": 54}, {"text": "prognosis", "size": 10}, {"text": "pathogenic", "size": 38}]
         wordcloud_data = json.dumps(wordcloud_data)
@@ -195,7 +201,6 @@ def cyEmbeddings():
             elif years == "201517":
                 message_years = "2015-2017"
             else:
-                logging.info("something didn't work right... year_interval is being set to 2010-2013")
                 message_years = str(years)
             message = str(k_clusters) + " topics from the top ~" + str(window) + " noun phrases from " + str(message_years)
             return render_template("embeddings.html", filepath=filepath, message=message)
