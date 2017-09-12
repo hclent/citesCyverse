@@ -133,7 +133,7 @@ def lemma_samples_by_year():
 		json_file = 'lemma_samples_' + str(json_file)
 		load_file = os.path.join(path_to_lemmas , json_file)
 
-		if year == 2015:
+		if year == 2017:
 			i += 1
 			try:
 				with open(load_file, 'rb') as f:
@@ -170,7 +170,7 @@ def lemma_samples_by_year():
 		# 		print(e)
 
 
-	print("2015: " + str(i))
+	print("2017: " + str(i))
 	print("LATER: " + str(j))
 
 
@@ -180,10 +180,10 @@ def lemma_samples_by_year():
 	#print("length of (unique) lemma_samples 2013: " + str(len(ls_2010)))
 	#
 	# Dump to pickle
-	lemmas_2010_file = os.path.join(path_to_lemmas, "cyverse_lemmas_2015.pickle")
+	lemmas_2010_file = os.path.join(path_to_lemmas, "cyverse_lemmas_2017.pickle")
 	with open(lemmas_2010_file, "wb") as fw:
 		pickle.dump(ls_2010 , fw)
-	print("2015 dumped to pickle!")
+	print("2017 dumped to pickle!")
 
 
 
@@ -212,6 +212,16 @@ def lemma_samples_by_year():
 	# print("2014-2017 dumped to pickle!")
 
 
-lemma_samples_by_year()
+#lemma_samples_by_year()
 
 
+def extractStuff(filename):
+	filepath = "/home/hclent/repos/citesCyverse/flask/lemmas/"
+	openfile = filepath + filename
+	with open(openfile, "rb") as f:
+		lemma_samples = pickle.load(f)
+	words = [' '.join(l[1]) for l in lemma_samples]
+	return words
+
+# words = extractStuff("cyverse_lemmas_2017.pickle")
+# print(words)
