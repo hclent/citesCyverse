@@ -25,7 +25,7 @@ def embedding_json(results, query, k, top_n, year):
     links = json_out["links"]
     print_json = {"nodes": ordered_nodes, "links": links}
 
-    save_path = "/Users/heather/Desktop/citesCyverse/static/fgraphs"
+    save_path = "/home/hclent/repos/citesCyverse/flask/static/fgraphs"
     filename =  'fgraph_' + str(query) + '_' + str(k) + '_' + str(top_n) + '_' +str(year) +'.json'
 
     completeName = os.path.join(save_path, filename)  # with the query for a name
