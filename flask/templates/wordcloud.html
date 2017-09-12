@@ -21,6 +21,18 @@
 <body>
 
 
+<div class="alert alert-info" role="alert">Example searches for wordcloud: ocean, cancer, disease, brain, arabidopsis, etc. (Please use only one word at a time!)</div>
+
+<div>
+<form action="https://geco.iplantcollaborative.org/hclent/citescyverse/cy-wordcloud/" class="form-inline" method="post">
+  <div class="form-group">
+    <label for="searchWord">Generate wordcloud for:</label>
+    <input type="text" class="form-control" id="searchWord" placeholder="e.g. ocean" name="searchWord" value="{{request.form.searchWord}}">
+  </div>
+  <button type="submit" id= "myButton" class="btn btn-primary" data-toggle="modal" data-target="#myModal">Submit</button>
+</form>
+</div>
+
 
 
  <!-- Progress modal -->
@@ -37,14 +49,14 @@
 
 				<!-- Progress bar that doesn't actually move -->
 				<div class="progress">
-				  <div class="progress-bar progress-bar-success progress-bar-striped active" role="progressbar" aria-valuenow="1" aria-valuemin="0" aria-valuemax="100" style="width: 45%">
-				    <span class="sr-only">45% Complete</span>
+				  <div class="progress-bar progress-bar-primary progress-bar-striped active" role="progressbar" aria-valuenow="1" aria-valuemin="0" aria-valuemax="100" style="width: 45%">
+				    <span class="sr-only">100% Complete</span>
 				  </div>
 				</div>
 
       </div>
       <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-primary" data-dismiss="modal">Close</button>
       </div>
     </div>
   </div>
@@ -53,9 +65,8 @@
 </body>
 <script>
     var fill = d3.scale.category20();
-//myjson = {{ wordcloud_data|tojson }};
-var frequency_list = {{ wordcloud_data|tojson }};
-//var frequency_list = JSON.parse( myjson );
+myjson = {{ wordcloud_data|tojson }};
+var frequency_list = JSON.parse( myjson );
 
   d3.layout.cloud().size([800, 800])
       .words(frequency_list)

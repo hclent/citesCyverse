@@ -3,26 +3,16 @@ from collections import defaultdict
 from processors import *
 from sklearn.metrics.pairwise import cosine_similarity
 from scipy import sparse
-from fasttext import load_model
+from app import model
 
 
-#load model once globally
-model = load_model("17kmodel.vec")
 
 
-vectors_dict = "/Users/heather/Desktop/citesCyverse/wordvecDict.pickle"
-path_to_lemma_samples = "/Users/heather/Desktop/citesCyverse/lemmas"
-path_to_wordcloud = "/Users/heather/Desktop/citesCyverse/static/wordclouds"
+#vectors_dict = "/home/hclent/repos/citesCyverse/flask/wordvecDict.pickle"
 
-#vectors_dict = "/home/hclent/tmp/citesCyverse/wordvecDict.pickle"
-#path_to_lemma_samples = "/home/hclent/tmp/citesCyverse/lemmas"
-#path_to_wordcloud = "/home/hclent/tmp/citesCyverse/static/wordclouds"
 
-lemmas_samples_ALL = "cyverse_lemmas_ALL.pickle"
 
-cyverse_stop_words = ['university', '%', 'table', 'figure', '\\u', '\\\\', '\\', 'author', 'publication', 'appendix',
-                      'table', 'author', 'skip', 'main', '.', 'title', 'u2009', 'publisher',
-                      'www.plantphysiol.org', 'copyright']
+
 
 
 #use train embeddings and do like "genetics cloud", "plant cloud", "ocean cloud", "animal cloud" ??
@@ -34,6 +24,12 @@ def flatten(listOfLists):
 def frequency_dict(lemma_file):
     nesDict = defaultdict(lambda: 0) # can't pickle a default dict, but seems fast enought o generate..
 
+    cyverse_stop_words = ['university', '%', 'table', 'figure', '\\u', '\\\\', '\\', 'author', 'publication',
+                          'appendix',
+                          'table', 'author', 'skip', 'main', '.', 'title', 'u2009', 'publisher',
+                          'www.plantphysiol.org', 'copyright']
+
+    path_to_lemma_samples = "/home/hclent/repos/citesCyverse/flask/lemmas"
     full_filename = os.path.join(path_to_lemma_samples, lemma_file) #pickle
     with open(full_filename, "rb") as f:
         lemma_samples = pickle.load(f)
@@ -80,21 +76,21 @@ def wordcloud(query, nesDict, wordcloud_words):
         wordcloud_list.append(entry)
 
     wordcloud_json = json.dumps(wordcloud_list)
-    print(wordcloud_json)
+    #print(wordcloud_json)
 
-    # filename = query + ".json"
-    # path = os.path.join(path_to_wordcloud, filename)
-    #print(path)
+    path_to_wordcloud = "/home/hclent/repos/citesCyverse/flask/static/wordclouds"
+    filename = query + ".json"
+    path = os.path.join(path_to_wordcloud, filename)
 
-    # #TODO: this is not dumping to json :/
-    # with open(path) as out:
-    #     json.dumps(wordcloud_json, out)
+
+    with open(path, "w") as out:
+        json.dump(wordcloud_json, out)
 
     return wordcloud_json
 
 
-nesDict = frequency_dict("cyverse_lemmas_ALL.pickle")
-wordcloud_words = filter_by_embeddings("disease", nesDict)
-print(wordcloud_words)
-print("#"*20)
-wordcloud_json = wordcloud("disease", nesDict, wordcloud_words)
+# nesDict = frequency_dict("cyverse_lemmas_ALL.pickle")
+# wordcloud_words = filter_by_embeddings("disease", nesDict)
+# print(wordcloud_words)
+# print("#"*20)
+# wordcloud_json = wordcloud("disease", nesDict, wordcloud_words)
