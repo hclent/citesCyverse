@@ -1,6 +1,6 @@
-import os
+import os, pickle
 from biodoc_preproc import retrieveBioDocs, loadBioDoc
-from make_lemmas import print_lemma_nes_samples, concat_lemma_nes_samples, load_lemma_cache
+#from make_lemmas import print_lemma_nes_samples, concat_lemma_nes_samples, load_lemma_cache
 from fasttext import get_words_tags, transform_text, chooseTopNPs, load_model, getNPvecs
 from sklearn.cluster import KMeans
 from fgraph2json import embedding_json
@@ -21,7 +21,22 @@ from fgraph2json import embedding_json
 
 
 #Get fasttexts vecs
-# flat_words, flat_tags = get_words_tags(path_to_early)
+# filename = 'cyverse_lemmas_' + "2015_2017" + '.pickle'
+# path = os.path.join("/home/hclent/repos/citesCyverse/flask/lemmas", filename)
+# print(path)
+#
+# with open(path, "rb") as f:
+#     lemma_samples = pickle.load(f)
+#
+# print(len(lemma_samples))
+# print(lemma_samples[5])
+#
+# flat_words, flat_tags = get_words_tags(path)
+# print(flat_words[:10])
+# print(flat_tags[:10])
+# print(type(flat_words))
+# print(type(flat_tags))
+#
 # xformed_tokens = transform_text(flat_words, flat_tags)
 # npDict = chooseTopNPs(xformed_tokens)
 #print("LEN NPDICT BEFORE FILTERING: " + str(len(npDict.keys()))) #There are 249,199 noun phrases in the 760 documents
@@ -50,58 +65,87 @@ model = load_model("17kmodel.vec")
 
 query = "cyverse"
 
+#TODO: re-run this only for 201014 and 201517 after I figure out what the bug is
+# seems bug is only with 201517
+
 def generateFiles():
    possible_ks = [10, 15, 20, 25]
-   possible_years = [2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 201014, 201517]
+   possible_years = [201517]
+   #possible_years = [2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 201014, 201517]
    possible_windows = [100, 200, 300, 400]
 
    for year in possible_years:
-      filename = 'cyverse_lemmas_' + str(year) + '.pickle'
-      path = os.path.join("/home/hclent/repos/citesCyverse/flask/lemmas", filename)
-      print(path)
-      for window in possible_windows:
-         try:
-            flat_words, flat_tags = get_words_tags(path)
-            xformed_tokens = transform_text(flat_words, flat_tags)
-            npDict = chooseTopNPs(xformed_tokens)
+       if year == 201014:
+           save_year = "2010_2014"
+       if year == 201517:
+           save_year = "2015_2017"
 
-            if window == 100:
-                top = list(npDict.most_common(100))
-            elif window == 200:
-                top_100 = list(npDict.most_common(101))
-                top_200 = list(npDict.most_common(200))
-                top = [item for item in top_200 if item not in top_100]
-            elif window == 300:
-                top_200 = list(npDict.most_common(201))
-                top_300 = list(npDict.most_common(300))
-                top = [item for item in top_300 if item not in top_200]
-            elif window == 400:
-                top_300 = list(npDict.most_common(301))
-                top_400 = list(npDict.most_common(400))
-                top = [item for item in top_400 if item not in top_300]
-            else:
-                top = list(npDict.most_common(window))
+       filename = 'cyverse_lemmas_' + str(save_year) + '.pickle'
+       path = os.path.join("/home/hclent/repos/citesCyverse/flask/lemmas", filename)
+       print(path)
+       print(os.path.isfile(path))
+       for window in possible_windows:
+           try:
+               flat_words, flat_tags = get_words_tags(path)
+               xformed_tokens = transform_text(flat_words, flat_tags)
+               npDict = chooseTopNPs(xformed_tokens)
+               if window == 100:
+                   top = list(npDict.most_common(100))
+               elif window == 200:
+                   top_100 = list(npDict.most_common(101))
+                   top_200 = list(npDict.most_common(200))
+                   top = [item for item in top_200 if item not in top_100]
+               elif window == 300:
+                   top_200 = list(npDict.most_common(201))
+                   top_300 = list(npDict.most_common(300))
+                   top = [item for item in top_300 if item not in top_200]
+               elif window == 400:
+                   top_300 = list(npDict.most_common(301))
+                   top_400 = list(npDict.most_common(400))
+                   top = [item for item in top_400 if item not in top_300]
+               else:
+                   top = list(npDict.most_common(window))
 
-            matrix = getNPvecs(top, model)  # top or npDict can go here
-
-            for k in possible_ks:
-               # do kmeans
-               kmeans = KMeans(n_clusters=k, random_state=2).fit(matrix)
-               results = list(zip(kmeans.labels_, top))
-               embedding_json(results, "cyverse", k, window, year)
-               print("PRINTED A FILE TO FGRAPHS!")
-         except Exception as e:
-            print(e)
+               matrix = getNPvecs(top, model)  # top or npDict can go here
 
 
-generateFiles()
-#Make file for vis to use 
-#embedding_json(results, QUERY, 50, TOP_N)
-#embedding_json(results, query, 20, 100)
+               for k in possible_ks:
+                   kmeans = KMeans(n_clusters=k, random_state=2).fit(matrix)
+
+
+                   results = list(zip(kmeans.labels_, top))
+
+
+                   #FILTERING OUT SMALL TOPICS:
+                   labels = [r[0] for r in results]
+
+                   delete_topics = []
+                   for i in range(0, k):
+                       if labels.count(i) < 3: #clean out topics with less than 3 words in them
+                           delete_topics.append(i)
+
+                   keep_results = []
+
+                   for combo in results:
+                       if combo[0] not in delete_topics:
+                           keep_results.append(combo)
+
+                   embedding_json(keep_results, "cyverse", k, window, year)
+                   print("PRINTED A FILE TO FGRAPHS!")
+           except Exception as e:
+               print(e)
+
+
+
+
+#generateFiles()
+
+
 # for i in range(1, 21):
 #    topic = [tup for tup in results if tup[0] == i]
 #    print(topic)
 #    print("#" * 20)
+
 
 # favorite_results = [
 # (1, ('analysis tool', 21)), (1, ('analysis datum', 13)), (1, ('analysis program', 9)), (1, ('analysis step', 6)), (1, ('regression analysis', 5)), (1, ('analysis pipeline', 5)),  (1, ('analysis software', 4)), (1, ('analysis workflow', 4)), (1, ('analysis publication', 3)),
@@ -124,11 +168,4 @@ generateFiles()
 # (18, ('venom composition', 6)), (18, ('venom potency', 4)), (18, ('venom transmission system', 3)),
 # (19, ('bone colonization', 9)), (19, ('bone fragment', 6)), (19, ('bone microenvironment', 4)), (19, ('bone lesion', 4)), (19, ('metastasis model', 3)), (19, ('bone fragment drug concentration', 3)), (19, ('bone segment', 2)), (19, ('bone tissue', 2)),
 # (20, ('coral sponge', 9)), (20, ('sea anemone', 7)), (20, ('seawater sample', 5)), (20, ('sea water', 3)), (20, ('coral density', 3)), (20, ('coral reef', 3)), (20, ('sediment m. griffithsi.', 2)), (20, ('sea canyon', 2)), (20, ('coral habitat', 2)), (20, ('sea pen', 2)), (20, ('submarine canyon', 2)), (20, ('sea ice', 2)), (20, ('nematocyst diversity', 2))]
-
-
 #embedding_json(favorite_results, query, 20, '10kFAV')
-#print("made results!!")
-#(20, ('coral sponge', 9)), (20, ('sea anemone', 7)), (20, ('seawater sample', 5)), (20, ('sea water', 3)), (20, ('coral density', 3)), (20, ('coral reef', 3)), (20, ('sediment m. griffithsi.', 2)), (20, ('sea canyon', 2)), (20, ('coral habitat', 2)), (20, ('sea pen', 2)), (20, ('submarine canyon', 2)), (20, ('sea ice', 2)), (20, ('nematocyst diversity', 2))
-#(710, ('ocean perch', 10)), (710, ('ocean basement', 9)), (710, ('ocean virome', 5)), (710, ('ocean sampling day', 4)), (710, ('phytoplankton bloom', 3)), (710, ('plume sample', 3)), (710, ('ocean water sampling', 2)), (710, ('plume metagenome', 2)), (710, ('ocean drilling program iodp u1362a u1362b', 2)), (710, ('current seafloor topography', 2)), (710, ('crust seafloor', 2)), (710, ('seafloor observatory', 2)), (710, ('bloom taxonomy', 2))
-#(645, ('language processing', 9)), (645, ('learning gain', 7)), (645, ('language owl', 3)), (645, ('markup language', 3)), (645, ('learning survey', 3)), (645, ('language processing algorithm', 2)), (645, ('language description', 2)), (645, ('learning benefit', 2)), (645, ('skill category', 2)), (645, ('scalum language language java', 2)), (645, ('autism spectrum disorder asd', 2)), (645, ('call format', 2)), (645, ('phone call', 2)), (645, ('language setting', 2))
-#(19, ('climate change', 13)), (19, ('land area', 10)), (19, ('coral sponge', 9)), (19, ('habitat area', 8)), (19, ('climate stability', 5)), (19, ('habitat class', 5)), (19, ('fish habitat', 4)), (19, ('fauna flora', 4)), (19, ('mammal park aquarium', 3)), (19, ('fishing gear', 3)), (19, ('coral density', 3)), (19, ('weather datum', 3)),
