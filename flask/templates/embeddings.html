@@ -27,13 +27,14 @@
         }
         .fdg {
             position: absolute;
-            top: 15px;
+            top: 150px;
             left: 300px;
             width: 78%;
             float: right;
         }
         .links line {
-            stroke: #999;
+            stroke: #c7c7c7;
+            /*originally #999*/
             stroke-opacity: 0.6;
         }
         .nodes circle {
@@ -174,12 +175,15 @@
 var svg = d3.select(".fdg"),
     width = +svg.attr("width"),
     height = +svg.attr("height"),
-    max_radius = 7;
+    max_radius = 9; //size of circle
 var color = d3.scaleOrdinal(d3.schemeCategory20);
+
+
 var simulation = d3.forceSimulation()
+    .force("gravity", d3.forceManyBody().strength(3))
     .force("link", d3.forceLink().id(function (d) { return d.id; }).distance(100)) //.distance() is the same as linkDistance()
-    .force("charge", d3.forceManyBody().strength(-5))
-    .force("center", d3.forceCenter(width / 1.5, height / 1.5));
+    .force("charge", d3.forceManyBody().strength(-19)) //default is -5, i like -15 //repulsion because its negative
+    .force("center", d3.forceCenter(width / 2, height / 2));
 
 d3.json("{{ url_for('static', filename=filepath) }}", function(error, graph) {
  if (error) throw error;
@@ -376,6 +380,7 @@ function d3_rebind(target, source, method) {
     return value === source ? target : value;
   };
 }
+
 // Virtual Scroller (source: http://bl.ocks.org/billdwhite/36d15bc6126e6f6365d0)
 d3.VirtualScroller = function() {
     var enter = null,
