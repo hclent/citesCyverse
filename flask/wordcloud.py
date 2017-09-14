@@ -1,12 +1,16 @@
-import os, json, pickle, nltk
+import os, json, pickle, nltk, logging, sys
 from collections import defaultdict, Counter
 from processors import *
 from sklearn.metrics.pairwise import cosine_similarity
 from scipy import sparse
+sys.path.append('/home/hclent/repos/citesCyverse/flask/')
 from app import model
 #from fasttext import load_model
 
-#model = load_model("17kmodel.vec")
+#model = load_model("cyverse_lower.vec")
+
+logging.basicConfig(filename='.app.log',level=logging.DEBUG)
+logging.basicConfig(format='%(asctime)s %(message)s', datefmt='%m/%d/%Y %I:%M:%S %p')
 
 
 #use train embeddings and do like "genetics cloud", "plant cloud", "ocean cloud", "animal cloud" ??
@@ -44,19 +48,23 @@ def frequency_dict(lemma_file):
 
     words = [l[1] for l in lemma_samples]
     flat_words = flatten(words)
-    keep_words =  [w for w in flat_words if w not in cyverse_stop_words]
+
+    keep_words =  [w.lower() for w in flat_words if w.lower() not in cyverse_stop_words]
 
     for word in keep_words: #for word in keep_words list
         nesDict[word] += 1
 
+    logging.info("made the dict!")
     return nesDict
 
 
 def filter_by_embeddings(query, nesDict):
+    logging.info("filtering by embeddings")
+    logging.info(model)
     wc_words = []
+    query = query.lower()
     try:
         query_vec = sparse.csr_matrix(model[query])
-        #print(query_vec)
         for word in nesDict.keys():
             try:
                 word_vec = sparse.csr_matrix(model[word])
@@ -64,23 +72,26 @@ def filter_by_embeddings(query, nesDict):
                 if sim > 0.65: #50?
                     wc_words.append(word)
             except Exception as e:
-                #print("no vector for word: " + str(word))
                 pass #no vector for that word
     except Exception as e:
+        logging.info(e)
         raise Exception("the query word does not have a vector! Please use another word!!")
+    logging.info(wc_words)
     return wc_words
 
 
 #D3 wordcloud, where nesDict is a frequency dict and x is our threshold
 def wordcloud(query, nesDict, wordcloud_words):
+    logging.info("gonna make the wordcloud json now! :') ")
     wordcloud_list = [] #will dump this to json
+    query = query.lower()
 
     for word in wordcloud_words:
         size = nesDict[word]
         if size < 10:
             entry = {"text": word, "size": 10}
         else:
-            entry = {"text": word, "size": int(nesDict[word]*0.01)} # if the size is too big (like 20,000) you MUST scale it or it will not show up in the vis
+            entry = {"text": word, "size": int(nesDict[word])} # if the size is too big (like 20,000) you MUST scale it or it will not show up in the vis
 
 
         wordcloud_list.append(entry)
@@ -90,7 +101,7 @@ def wordcloud(query, nesDict, wordcloud_words):
     path_to_wordcloud = "/home/hclent/repos/citesCyverse/flask/static/wordclouds"
     filename = query + ".json"
     path = os.path.join(path_to_wordcloud, filename)
-
+    logging.info(path)
 
     with open(path, "w") as out:
         json.dump(wordcloud_json, out)
@@ -102,7 +113,7 @@ def wordcloud(query, nesDict, wordcloud_words):
 
 
 # nesDict = frequency_dict("cyverse_lemmas_ALL.pickle")
-# wordcloud_words = filter_by_embeddings("disease", nesDict)
+# wordcloud_words = filter_by_embeddings("dna", nesDict)
 # print(wordcloud_words)
 # print("#"*20)
 # wordcloud_json = wordcloud("disease", nesDict, wordcloud_words)

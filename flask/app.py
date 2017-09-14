@@ -22,7 +22,7 @@ logging.basicConfig(format='%(asctime)s %(message)s', datefmt='%m/%d/%Y %I:%M:%S
 
 #load model once globally
 logging.info("* LOADING FASTTEXT MODEL... THIS TAKES A WHILE...")
-model = load_model("17kmodel.vec") #"cyverseModel.vec
+model = load_model("cyverse_lower.vec") #"cyverseModel.vec
 logging.info("!!! DONE LOADING FASTTEXT MODEL :')")
 
 #Form for Topic Modeling
@@ -69,6 +69,7 @@ def cyWordcloud():
     form = wordCloudWord()
     if request.method == "POST":
         searchWord = str(form.searchWord.data)
+        searchWord = searchWord.lower()
         logging.info(searchWord)
         #check for file
 
