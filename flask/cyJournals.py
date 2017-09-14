@@ -6,7 +6,8 @@ from collections import defaultdict
 potential_years_list = []
 potential_journals_list = []
 
-with open('spreadsheet.tsv', 'r') as tsvin:
+#TODO: check for bio status
+with open('journalsNoDuplicates.tsv', 'r') as tsvin:
 	tsv = csv.reader(tsvin, delimiter='\t')
 
 	for row in tsv:
@@ -22,6 +23,7 @@ with open('spreadsheet.tsv', 'r') as tsvin:
 		except Exception as e2:
 			# no journal
 			pass
+
 
 
 #step 2: clean the data
@@ -99,7 +101,10 @@ def journals_vis(years_range, years_list, journals):
 		sum_j +=1
 	#print(journalsTotalDict)
 
-	#Sorted by counts MOST --> LEAST
+	#This sourts by A --> Z journal names
+	#unique_journals = list(sorted(journalsTotalDict.keys(), key=str.lower))
+
+	# Sorted by counts MOST --> LEAST
 	sorted_dict = sorted(journalsTotalDict.items(), key=operator.itemgetter(1), reverse=True)
 	unique_journals = [journal[0] for journal in sorted_dict]
 
@@ -109,7 +114,7 @@ def journals_vis(years_range, years_list, journals):
 		#print(j)
 		#Initiate the dictionary for this journal
 		journal_data = {
-			"name": j,
+			"name": str("(" + str(journalsTotalDict[j])+") " + j), #e.g. (7) Nature
 			"articles": [], #[[year, number], [year, number]]
 			"total": journalsTotalDict[j]   #total can get from journalsTotalDict with key (total is value)
 		}
@@ -148,7 +153,7 @@ def journals_vis(years_range, years_list, journals):
 	#Example range info: [('2008', '2016'), 165, 48] means years 2008-2016, 165 publications, 48 unique journals
 
 	publication_data = json.dumps(publication_data)
-	with open('/Users/heather/Desktop/citesCyverse/static/journalsvis.json' ,'w') as outfile:
+	with open('/home/hclent/repos/citesCyverse/flask/static/journalsvis_freq.json' ,'w') as outfile:
 		json.dump(publication_data, outfile)
 
 	return publication_data, range_info
@@ -159,6 +164,5 @@ def journals_vis(years_range, years_list, journals):
 # print(len(potential_journals_list)) #787
 # combo = list(zip(potential_years_list, potential_journals_list)) #should be 1-1
 # years_list, journals = clean_combo(combo)
-# print(years_list)
-# years_range = (2010, 2017) #CyVerse is 2011-2017; added extra yera to both side for padding.
+# years_range = (2010, 2017) #CyVerse is 2010-2017; added extra yera to both side for padding.
 # journals_vis(years_range, years_list, journals)

@@ -22,7 +22,7 @@ logging.basicConfig(format='%(asctime)s %(message)s', datefmt='%m/%d/%Y %I:%M:%S
 
 #load model once globally
 logging.info("* LOADING FASTTEXT MODEL... THIS TAKES A WHILE...")
-model = load_model("cyverse_lower.vec") #"cyverseModel.vec
+#model = load_model("cyverse_lower.vec") #"cyverseModel.vec
 logging.info("!!! DONE LOADING FASTTEXT MODEL :')")
 
 #Form for Topic Modeling
@@ -46,17 +46,28 @@ def homeCyverse():
     return render_template("dashboard.html")
 
 
-#TODO: collapse repeat/similar journal names
-@app.route("/cy-journals/")
-def cyJournals():
-    filename = "/home/hclent/repos/citesCyverse/flask/static/journalsvis.json"
+#TODO: add buttons to switch between thingies
+@app.route("/cy-journals-freq/")
+def cyJournalsFreq():
+    s_year = "2010" #start
+    e_year = "2017" #end
+    unique_pubs = "753"
+    unique_journals = "344"
+    filename = "/home/hclent/repos/citesCyverse/flask/static/journalsvis_freq.json"
     with open(filename) as f:
         journals = json.load(f)
-    s_year = "2010" #start
-    e_year = "2018" #end
+    return render_template("journals.html", journals=journals, unique_pubs=unique_pubs,
+                       unique_journals=unique_journals, s_year=s_year, e_year=e_year)
+
+@app.route("/cy-journals-alpha/")
+def cyJournalsAlpha():
+    s_year = "2010"  # start
+    e_year = "2017"  # end
     unique_pubs = "753"
-    unique_journals = "467" #needs to be updated
-    #journals = {}
+    unique_journals = "344"
+    filename_alpha = "/home/hclent/repos/citesCyverse/flask/static/journalsvis_alpha.json"
+    with open(filename_alpha) as f:
+        journals = json.load(f)
     return render_template("journals.html", journals=journals, unique_pubs=unique_pubs,
                            unique_journals=unique_journals, s_year=s_year, e_year=e_year)
 

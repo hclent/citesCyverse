@@ -3,6 +3,13 @@
   <!--D3-->
  <script src="{{ url_for('static', filename='js/third-party/d3/d3.min.js') }}"></script>
 
+     <!--Bootstrap -->
+	<link href= "{{ url_for('static',
+	filename='js/third-party/bootstrap/dist/css/bootstrap.min.css')}}" rel="stylesheet">
+    <script src="{{ url_for('static', filename='js/third-party/jquery/dist/jquery.min.js') }}"></script>
+	<script type="text/javascript" src="{{ url_for('static', filename='js/third-party/bootstrap/dist/js/bootstrap.min.js') }}">
+	</script>
+
   <link rel="stylesheet" type="text/css" href="citesCyverse/static/css/journal-style.css">
 
 
@@ -19,7 +26,27 @@ text.value{font-size:12px;font-weight:bold;}
 <body>
 
 
-<h1> {{unique_pubs|safe}} publications in {{unique_journals|safe}} different journals  </h1> <!--title goes here-->
+<h3> {{unique_pubs|safe}} publications cite iPlant/CyVerse in {{unique_journals|safe}} different journals  </h3> <!--title goes here-->
+
+<div id="buttonsGoHere">
+
+    <a href="https://geco.iplantcollaborative.org/hclent/citescyverse/cy-journals-freq/">
+    <button type="button" class="btn btn-default">
+    <span class="glyphicon glyphicon-sort-by-attributes-alt" aria-hidden="true"></span> Sort by frequency
+    </button>
+    </a>
+
+    <a href="https://geco.iplantcollaborative.org/hclent/citescyverse/cy-journals-alpha/">
+    <button type="button" class="btn btn-default">
+    <span class="glyphicon glyphicon-font" aria-hidden="true"></span> Sort alphabetically
+    </button>
+    </a>
+
+</div>
+
+
+
+
 <script type="text/javascript">
 function truncate(str, maxLength, suffix) {
   if(str.length > maxLength) {
@@ -30,9 +57,9 @@ function truncate(str, maxLength, suffix) {
   return str;
 }
 
-var margin = {top: 20, right: 600, bottom: 0, left: 20},
+var margin = {top: 20, right: 700, bottom: 0, left: 20},
   width = 800,
-  height = 9450;
+  height = 7000;
 var start_year = {{ s_year |safe}},
     end_year = {{ e_year |safe}};
 var c = d3.scale.category20c();
