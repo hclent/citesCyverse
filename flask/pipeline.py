@@ -21,29 +21,28 @@ from fgraph2json import embedding_json
 
 
 #Get fasttexts vecs
-# filename = 'cyverse_lemmas_' + "2015_2017" + '.pickle'
+# filename = 'cyverse_lemmas_' + "2010" + '.pickle'
 # path = os.path.join("/home/hclent/repos/citesCyverse/flask/lemmas", filename)
 # print(path)
 #
 # with open(path, "rb") as f:
 #     lemma_samples = pickle.load(f)
-#
-# print(len(lemma_samples))
-# print(lemma_samples[5])
-#
+
 # flat_words, flat_tags = get_words_tags(path)
 # print(flat_words[:10])
 # print(flat_tags[:10])
 # print(type(flat_words))
 # print(type(flat_tags))
+
+
 #
 # xformed_tokens = transform_text(flat_words, flat_tags)
 # npDict = chooseTopNPs(xformed_tokens)
-#print("LEN NPDICT BEFORE FILTERING: " + str(len(npDict.keys()))) #There are 249,199 noun phrases in the 760 documents
-
-### OPTIONAL FILTER npDICT ####
-# top = list(npDict.most_common(300))
-# other_top = list(npDict.most_common(400))
+# #print("LEN NPDICT BEFORE FILTERING: " + str(len(npDict.keys()))) #There are 249,199 noun phrases in the 760 documents
+#
+# ### OPTIONAL FILTER npDICT ####
+# top = list(npDict.most_common(1000))
+# other_top = list(npDict.most_common(1100))
 # keep_top = [item for item in other_top if item not in top]
 
 '''
@@ -61,24 +60,29 @@ model = load_model("17kmodel.vec")
 # #do kmeans
 # kmeans = KMeans(n_clusters=20, random_state=2).fit(matrix)
 # results = list(zip(kmeans.labels_, keep_top))
+# #
 #
+# query = "cyverse"
+# for i in range(0, 21):
+#    topic = [tup for tup in results if tup[0] == i]
+#    print(topic)
+#    print("#" * 20)
 
-query = "cyverse"
 
-#TODO: re-run this only for 201014 and 201517 after I figure out what the bug is
-# seems bug is only with 201517
+
 
 def generateFiles():
    possible_ks = [10, 15, 20, 25]
-   possible_years = [201517]
-   #possible_years = [2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 201014, 201517]
-   possible_windows = [100, 200, 300, 400]
+   possible_years = [2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 201014, 201517]
+   possible_windows = [100, 200, 300, 400, 500, 600, 700, 800, 900, 1000]
 
    for year in possible_years:
        if year == 201014:
            save_year = "2010_2014"
        if year == 201517:
            save_year = "2015_2017"
+       else:
+           save_year = year
 
        filename = 'cyverse_lemmas_' + str(save_year) + '.pickle'
        path = os.path.join("/home/hclent/repos/citesCyverse/flask/lemmas", filename)
@@ -103,6 +107,31 @@ def generateFiles():
                    top_300 = list(npDict.most_common(301))
                    top_400 = list(npDict.most_common(400))
                    top = [item for item in top_400 if item not in top_300]
+               elif window == 500:
+                   top_half = list(npDict.most_common(401))
+                   bottom_half = list(npDict.most_common(500))
+                   top = [item for item in bottom_half if item not in top_half]
+               elif window == 600:
+                   top_half = list(npDict.most_common(501))
+                   bottom_half = list(npDict.most_common(600))
+                   top = [item for item in bottom_half if item not in top_half]
+               elif window == 700:
+                   top_half = list(npDict.most_common(601))
+                   bottom_half = list(npDict.most_common(700))
+                   top = [item for item in bottom_half if item not in top_half]
+               elif window == 800:
+                   top_half = list(npDict.most_common(701))
+                   bottom_half = list(npDict.most_common(800))
+                   top = [item for item in bottom_half if item not in top_half]
+               elif window == 900:
+                   top_half = list(npDict.most_common(801))
+                   bottom_half = list(npDict.most_common(900))
+                   top = [item for item in bottom_half if item not in top_half]
+               elif window == 1000:
+                   top_half = list(npDict.most_common(901))
+                   bottom_half = list(npDict.most_common(1000))
+                   top = [item for item in bottom_half if item not in top_half]
+
                else:
                    top = list(npDict.most_common(window))
 
@@ -121,7 +150,7 @@ def generateFiles():
 
                    delete_topics = []
                    for i in range(0, k):
-                       if labels.count(i) < 3: #clean out topics with less than 3 words in them
+                       if labels.count(i) < 2: #clean out topics with less than 3 words in them
                            delete_topics.append(i)
 
                    keep_results = []
@@ -138,34 +167,28 @@ def generateFiles():
 
 
 
-#generateFiles()
-
-
-# for i in range(1, 21):
-#    topic = [tup for tup in results if tup[0] == i]
-#    print(topic)
-#    print("#" * 20)
+generateFiles()
 
 
 # favorite_results = [
-# (1, ('analysis tool', 21)), (1, ('analysis datum', 13)), (1, ('analysis program', 9)), (1, ('analysis step', 6)), (1, ('regression analysis', 5)), (1, ('analysis pipeline', 5)),  (1, ('analysis software', 4)), (1, ('analysis workflow', 4)), (1, ('analysis publication', 3)),
-# (2, ('bioinformatic tool', 20)), (2, ('bioinformatic pipeline', 11)), (2, ('pipeline framework', 9)), (2, ('bioinformatic software', 8)), (2, ('bioinformatic resource', 6)), (2, ('bioinformatic analysis', 5)), (2, ('bioinformatic project', 3)),
-# (3, ('salt stress', 24)), (3, ('stress response', 19)), (3, ('dehydration stress', 16)), (3, ('drought stress', 15)), (3, ('drought treatment', 6)), (3, ('drought tolerance', 6)), (3, ('stress tolerance', 4)), (3, ('drought condition', 4)), (3, ('water stress', 4)), (3, ('stress treatment', 4)), (3, ('photoperiod response index', 3)),
-# (4, ('perl script', 9)), (4, ('github repository', 7)), (4, ('custom script', 6)), (4, ('java interface', 5)), (4, ('spreadsheet program', 5)),  (4, ('python code', 4)), (4, ('wrapper script', 3)),
-# (5, ('honey bee', 14)), (5, ('bee microbiome', 8)), (5, ('bee species', 5)), (5, ('bee health', 4)), (5, ('bee gut microbiome', 3)), (5, ('bee cornerstone', 2)), (5, ('flea beetle', 2)),
-# (6, ('image datum', 9)), (6, ('image analysis', 8)), (6, ('image collection', 7)), (6, ('bioluminescence imaging', 6)), (6, ('image harvest', 6)), (6, ('imaging platform', 4)), (6, ('image processing step', 4)), (6, ('imaging technology', 3)),
-# (7, ('d. oligosanthe', 26)), (7, ('a. palmerus', 16)), (7, ('f. pringleus', 16)), (7, ('f. prus', 13)), (7, ('a. pubescen', 9)), (7, ('s. viridi', 8)), (7, ('f. angustifolium', 8)), (7, ('a. sulca', 6)), (7, ('m. griffithsus', 6)), (7, ('s. mirarab', 5)),  (7, ('f. bidenti', 4)), (7, ('b. vulgari', 4)), (7, ('c. posadasius', 4)), (7, ('m. truncatulum', 3)), (7, ('s. aleutianus', 3)),
-# (8, ('host prediction', 24)), (8, ('host genome', 23)), (8, ('host virus', 12)), (8, ('host prediction accuracy', 10)), (8, ('defense response', 10)), (8, ('host strain', 7)), (8, ('host taxonomy', 7)), (8, ('host sequence', 5)), (8, ('host contig', 5)), (8, ('host metabolism', 4)), (8, ('host health', 3)),
-# (9, ('life science', 18)), (9, ('life cycle', 15)), (9, ('life history', 10)), (9, ('life technology', 7)), (9, ('life history ecotype', 4)), (9, ('life history strategy', 3)), (9, ('life stage', 3)),
-# (10, ('arabidopsis thaliana', 27)), (10, ('maize genome', 20)), (10, ('rice genome', 13)), (10, ('sorghum bicolor', 12)), (10, ('brachypodium distachyon', 12)), (10, ('rice chromosome', 9)), (10, ('arabidopsis genome', 7)), (10, ('rice gene', 6)), (10, ('brachypodium genome', 5)), (10, ('arabidopsis protein', 5)), (10, ('maize anthocyanin phlobaphene', 5)),
-# (11, ('cancer cell', 30)), (11, ('breast cancer cell', 6)), (11, ('lymphocyte apoptosis', 4)), (11, ('tumour cell', 3)), (11, ('cancer cell bica', 3)),
-# (12, ('population size', 6)), (12, ('population analysis', 5)), (12, ('population m. guttatus', 5)), (12, ('population quality', 4)), (12, ('variation rna quality', 4)), (12, ('population community ontology', 4)), (12, ('variation datum', 4)), (12, ('population development', 3)),
-# (13, ('model organism', 33)), (13, ('model species', 13)), (13, ('model system', 12)), (13, ('modeling framework', 9)), (13, ('markov model', 8)), (13, ('model condition', 7)), (13, ('model development', 4)), (13, ('model plant', 4)), (13, ('model parameter', 3)),
-# (14, ('promoter region', 20)), (14, ('region genome', 15)), (14, ('region chromosome', 13)), (14, ('region sequence similarity', 11)), (14, ('region interest', 10)), (14, ('coding region', 8)), (14, ('element name', 7)), (14, ('centromere region', 6)), (14, ('arm deletion', 6)), (14, ('location genome', 5)),
-# (15, ('human genome', 9)), (15, ('chicken line', 6)), (15, ('human genome project', 5)), (15, ('human blood', 4)), (15, ('human error', 4)), (15, ('human population', 4)), (15, ('human gut microbiota', 3)),
-# (16, ('blood transcriptome', 19)), (16, ('flow cytometry', 6)), (16, ('blood sample', 5)), (16, ('plasma membrane', 5)), (16, ('fluid sample', 5)), (16, ('blood transcriptome analysis', 4)), (16, ('donor sample', 4)),
-# (17, ('biodiversity datum', 28)), (17, ('informatics community', 7)), (17, ('biodiversity hotspot', 7)), (17, ('biodiversity information facility gbif', 7)), (17, ('biology community', 5)), (17, ('biodiversity community', 5)), (17, ('biodiversity science', 5)), (17, ('biodiversity domain', 4)),
-# (18, ('venom composition', 6)), (18, ('venom potency', 4)), (18, ('venom transmission system', 3)),
-# (19, ('bone colonization', 9)), (19, ('bone fragment', 6)), (19, ('bone microenvironment', 4)), (19, ('bone lesion', 4)), (19, ('metastasis model', 3)), (19, ('bone fragment drug concentration', 3)), (19, ('bone segment', 2)), (19, ('bone tissue', 2)),
-# (20, ('coral sponge', 9)), (20, ('sea anemone', 7)), (20, ('seawater sample', 5)), (20, ('sea water', 3)), (20, ('coral density', 3)), (20, ('coral reef', 3)), (20, ('sediment m. griffithsi.', 2)), (20, ('sea canyon', 2)), (20, ('coral habitat', 2)), (20, ('sea pen', 2)), (20, ('submarine canyon', 2)), (20, ('sea ice', 2)), (20, ('nematocyst diversity', 2))]
-#embedding_json(favorite_results, query, 20, '10kFAV')
+# (0, ('analysis tool', 21)), (0, ('analysis datum', 13)), (0, ('analysis program', 9)), (0, ('analysis step', 6)), (0, ('regression analysis', 5)), (0, ('analysis pipeline', 5)),  (0, ('analysis software', 4)), (0, ('analysis workflow', 4)), (0, ('analysis publication', 3)),
+# (1, ('bioinformatic tool', 20)), (1, ('bioinformatic pipeline', 11)), (1, ('pipeline framework', 9)), (1, ('bioinformatic software', 8)), (1, ('bioinformatic resource', 6)), (1, ('bioinformatic analysis', 5)), (1, ('bioinformatic project', 3)),
+# (2, ('salt stress', 24)), (2, ('stress response', 19)), (2, ('dehydration stress', 16)), (2, ('drought stress', 15)), (2, ('drought treatment', 6)), (2, ('drought tolerance', 6)), (2, ('stress tolerance', 4)), (2, ('drought condition', 4)), (2, ('water stress', 4)), (2, ('stress treatment', 4)), (2, ('photoperiod response index', 3)),
+# (3, ('perl script', 9)), (3, ('github repository', 7)), (3, ('custom script', 6)), (3, ('java interface', 5)), (3, ('spreadsheet program', 5)),  (3, ('python code', 4)), (3, ('wrapper script', 3)),
+# (4, ('honey bee', 14)), (4, ('bee microbiome', 8)), (4, ('bee species', 5)), (4, ('bee health', 4)), (4, ('bee gut microbiome', 3)), (4, ('bee cornerstone', 2)), (4, ('flea beetle', 2)),
+# (5, ('image datum', 9)), (5, ('image analysis', 8)), (5, ('image collection', 7)), (5, ('bioluminescence imaging', 6)), (5, ('image harvest', 6)), (5, ('imaging platform', 4)), (5, ('image processing step', 4)), (5, ('imaging technology', 3)),
+# (6, ('d. oligosanthe', 26)), (6, ('a. palmerus', 16)), (6, ('f. pringleus', 16)), (6, ('f. prus', 13)), (6, ('a. pubescen', 9)), (6, ('s. viridi', 8)), (6, ('f. angustifolium', 8)), (6, ('a. sulca', 6)), (6, ('m. griffithsus', 6)), (6, ('s. mirarab', 5)),  (6, ('f. bidenti', 4)), (6, ('b. vulgari', 4)), (6, ('c. posadasius', 4)), (6, ('m. truncatulum', 3)), (6, ('s. aleutianus', 3)),
+# (7, ('host prediction', 24)), (7, ('host genome', 23)), (7, ('host virus', 12)), (7, ('host prediction accuracy', 10)), (7, ('defense response', 10)), (7, ('host strain', 7)), (7, ('host taxonomy', 7)), (7, ('host sequence', 5)), (7, ('host contig', 5)), (7, ('host metabolism', 4)), (7, ('host health', 3)),
+# (8, ('life science', 18)), (8, ('life cycle', 15)), (8, ('life history', 10)), (8, ('life technology', 7)), (8, ('life history ecotype', 4)), (8, ('life history strategy', 3)), (8, ('life stage', 3)),
+# (9, ('arabidopsis thaliana', 27)), (9, ('maize genome', 20)), (9, ('rice genome', 13)), (9, ('sorghum bicolor', 12)), (9, ('brachypodium distachyon', 12)), (9, ('rice chromosome', 9)), (9, ('arabidopsis genome', 7)), (9, ('rice gene', 6)), (9, ('brachypodium genome', 5)), (9, ('arabidopsis protein', 5)), (9, ('maize anthocyanin phlobaphene', 5)),
+# (10, ('cancer cell', 30)), (10, ('breast cancer cell', 6)), (10, ('lymphocyte apoptosis', 4)), (10, ('tumour cell', 3)), (10, ('cancer cell bica', 3)),
+# (11, ('population size', 6)), (11, ('population analysis', 5)), (11, ('population m. guttatus', 5)), (11, ('population quality', 4)), (11, ('variation rna quality', 4)), (11, ('population community ontology', 4)), (11, ('variation datum', 4)), (11, ('population development', 3)),
+# (12, ('model organism', 33)), (12, ('model species', 13)), (12, ('model system', 12)), (12, ('modeling framework', 9)), (12, ('markov model', 8)), (12, ('model condition', 7)), (12, ('model development', 4)), (12, ('model plant', 4)), (12, ('model parameter', 3)),
+# (13, ('promoter region', 20)), (13, ('region genome', 15)), (13, ('region chromosome', 13)), (13, ('region sequence similarity', 11)), (13, ('region interest', 10)), (13, ('coding region', 8)), (13, ('element name', 7)), (13, ('centromere region', 6)), (13, ('arm deletion', 6)), (13, ('location genome', 5)),
+# (14, ('human genome', 9)), (14, ('chicken line', 6)), (14, ('human genome project', 5)), (14, ('human blood', 4)), (14, ('human error', 4)), (14, ('human population', 4)), (14, ('human gut microbiota', 3)),
+# (15, ('blood transcriptome', 19)), (15, ('flow cytometry', 6)), (15, ('blood sample', 5)), (15, ('plasma membrane', 5)), (15, ('fluid sample', 5)), (15, ('blood transcriptome analysis', 4)), (15, ('donor sample', 4)),
+# (16, ('biodiversity datum', 28)), (16, ('informatics community', 7)), (16, ('biodiversity hotspot', 7)), (16, ('biodiversity information facility gbif', 7)), (16, ('biology community', 5)), (16, ('biodiversity community', 5)), (16, ('biodiversity science', 5)), (16, ('biodiversity domain', 4)),
+# (17, ('venom composition', 6)), (17, ('venom potency', 4)), (17, ('venom transmission system', 3)),
+# (18, ('bone colonization', 9)), (18, ('bone fragment', 6)), (18, ('bone microenvironment', 4)), (18, ('bone lesion', 4)), (18, ('metastasis model', 3)), (18, ('bone fragment drug concentration', 3)), (18, ('bone segment', 2)), (18, ('bone tissue', 2)),
+# (19, ('coral sponge', 9)), (19, ('sea anemone', 7)), (19, ('seawater sample', 5)), (19, ('sea water', 3)), (19, ('coral density', 3)), (19, ('coral reef', 3)), (19, ('sediment m. griffithsi.', 2)), (19, ('sea canyon', 2)), (19, ('coral habitat', 2)), (19, ('sea pen', 2)), (19, ('submarine canyon', 2)), (19, ('sea ice', 2)), (19, ('nematocyst diversity', 2))]
+# embedding_json(favorite_results, query, 20, '10kFAV', "all")

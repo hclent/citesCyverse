@@ -1,6 +1,6 @@
 from processors import *
 import numpy as np
-import pickle
+import pickle, re
 from collections import defaultdict, Counter
 from gensim.models import Word2Vec #gensim=='0.13.2'
 
@@ -23,9 +23,22 @@ Step 5:
     cluster
 '''
 cyverse_stop_words = ['university', '%', 'table', 'figure', '\\u', '\\\\', '\\', 'author', 'publication', 'appendix',
-                      'table', 'author', 'skip', 'main', '.', 'title', 'u2009', 'publisher',
-                      'www.plantphysiol.org', 'copyright', 'san diego', 'california']
-
+                      'table', 'author', 'skip', 'main', '.', 'title', 'u2009', 'publisher', 'article',
+                      'www.plantphysiol.org', 'copyright', 'san diego', 'california',  '. . . .', '. .', ',', '.....',
+                      "\"", "1", ";", "3", '.', ' . ',
+                      "one", "also", "=", "2", "4" "number", 'j.', 'm.', 's.', 'many', 'b', '6', '10', 'however',
+                      'well', 'c', 'p.', '*', "'s", ':', "'", '0', '4', '-', 'three', 'may', 'non', 'could',
+                      'would', 'two', 'one', '.',
+                      'e.g.', 'doi', 'case', 'follow', 'describe', 'name', 'see', 'among', 'single', 'several',
+                      'run', 'additional','number', 'show', 'include', 'use', 'multiple', 'important', 'individual', 'like',
+                      'exist', 'related', 'gateway', 'control', 'suggest', 'high', 'allow', 'first', 'list', 'define', 'set',
+                      'new', 'different', 'thus', 'small', 'year', 'due', 'i.e.', '...', 'low', 'per', 'big', 'via',
+                      '. . . . .', 'full', 'another', 'second', '100', 'google', 'u2003', 'character', 'state', 'ieee',
+                      'july', 'vol', 'username', 'password', 'email', 'address', 'e01797', 'swetnam', '1 0/27', '1 0/21', 'sen.',
+                      'license', 'biorxiv', 'preprint', 'textgoogle', 'crossrefpubmedgoogle', 'john', 'wiley', 'peerj', 'apr.', 'view', 'scopus',
+                      'crossrefpubmedweb', 'sciencegoogle', 'scholar', '|', 'journal', 'apus', 'aug', 'publ', 'jan.', 'jan', 'sep',
+                      'springer', 'rights', 'elsevier', 'b.v.', 'appl19', 'biol', 'oxford', 'press', 'viewerdownload', 'powerpoint',
+                      'librarycopyright', 'letter', 'interest', 'tip', 'note', 'april', 'volume', 'isbn', "{", "}" "[", "]", 'n', 'user' ]
 
 
 def flatten(listOfLists):
@@ -47,19 +60,18 @@ def get_words_tags(path_to_lemma_samples):
     keep_words = []
     keep_tags = []
 
+    #TODO: preprocessing here!!!
     for c in list(zip(flat_words, flat_tags)):
         w = c[0]
         tag = c[1]
-        if w not in cyverse_stop_words:
+        #TODO: filter out dates like 1 0/27
+        if w not in cyverse_stop_words and not re.match('^(http|u\d{4}|google)', w):
             keep_words.append(w)
             keep_tags.append(tag)
 
 
     #print(keep_words[0:100])
     #print(keep_tags[0:100])
-
-    word_length = len(flat_words)
-    tag_length = len(flat_tags)
 
     filtered_words_len = len(keep_words)
     #print(filtered_words)
@@ -99,11 +111,12 @@ def transform_text(words, tags):
             # append current token
             transformed_tokens.append(w)
     #Cleaning the text :/ sorta hacky, sorry
-    keep_transformed_tokens = []
-    for t in transformed_tokens:
-        for w in cyverse_stop_words:
-            if not t.startswith(w) and w not in t.split(' '):
-                keep_transformed_tokens.append(t)
+    keep_transformed_tokens = [w for w in transformed_tokens if len(w.split()) < 4]
+    #TODO: this is probably not the place to do data cleaning!
+    # for t in transformed_tokens:
+    #     for w in cyverse_stop_words:
+    #         if not t.startswith(w) and w not in t.split(' '):
+    #             keep_transformed_tokens.append(t)
             # if t.startswith(w) and w in t.split(' '):
             #     print(t)
     return keep_transformed_tokens

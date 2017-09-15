@@ -31,7 +31,11 @@ class visOptions(Form):
 										  (15, 'k=15'),(20, 'k=20'),(25, 'k=25'),
                                           (40, 'k=40'),(50, 'k=50')])
     w_words = SelectField('w_words', choices=[(4, 'w=4'),(5, 'w=5'),(6, 'w=6'), (7, 'w=7'),
-											  (100, 'w=1-100'),(200, 'w=101-200'),(300, 'w=201-300'),(400, 'w=301-400')])
+											  (100, 'w=1-100'),(200, 'w=101-200'),(300, 'w=201-300'),(400, 'w=301-400'),
+                                              (500, 'w=401-500'),(600, 'w=501-600'),(700, 'w=601-700'),(800, 'w=701-800'),
+                                              (900, 'w=801-900'),(1000, 'w=901-1,000')])
+
+
     y_years = SelectField('y_years', choices=[(201014, '2010-2014'), (201517, '2015-2017'), (2010, '2010'),
                                               (2011, '2011'),(2012, '2012'),(2013, '2013'),(2014, '2014'),
                                               (2015, '2015'), (2016, '2016'), (2017, '2017')])
@@ -71,8 +75,6 @@ def cyJournalsAlpha():
                            unique_journals=unique_journals, s_year=s_year, e_year=e_year)
 
 
-#TODO: how to scale clouds with only small results? Or scale results with very large results and small results?
-#TODO: add more suggestions for clouds to look like
 @app.route("/cy-wordcloud/", methods=["GET", "POST"])
 def cyWordcloud():
     form = wordCloudWord()
@@ -109,7 +111,7 @@ def cyWordcloud():
 
     else:
         path_to_wordcloud = "/home/hclent/repos/citesCyverse/flask/static/wordclouds"
-        filename = "cyverseTop100.json"
+        filename = "cyverseTop100.json" #this is saved as top 100 but its really the top 200 oops
         path = os.path.join(path_to_wordcloud, filename)
         message = "Cloud for top 200 words in all citing papers"
         with open(path) as f:
@@ -120,7 +122,6 @@ def cyWordcloud():
 
 
 #TODO: Needs better filtering of cyverse-specific/publication stopwords ("figure", "table") etc.
-#TODO: need to decide what the bins will be here for top NPs (only the top 400 is probably not ideal)
 @app.route("/cy-embeddings/", methods=["GET","POST"])
 def cyEmbeddings():
     query = "cyverse"
@@ -172,21 +173,55 @@ def cyEmbeddings():
             if window == 100:
                 logging.info("w=1-100")
                 top = list(npDict.most_common(100))
+                message_window = "1-100"
             elif window == 200:
                 logging.info("w=101-200")
                 top_100 = list(npDict.most_common(101))
                 top_200 = list(npDict.most_common(200))
                 top = [item for item in top_200 if item not in top_100]
+                message_window = "101-200"
             elif window == 300:
                 logging.info("w=201-300")
                 top_200 = list(npDict.most_common(201))
                 top_300 = list(npDict.most_common(300))
                 top = [item for item in top_300 if item not in top_200]
+                message_window = "201-300"
             elif window == 400:
                 logging.info("w=301-400")
                 top_300 = list(npDict.most_common(301))
                 top_400 = list(npDict.most_common(400))
                 top = [item for item in top_400 if item not in top_300]
+                message_window = "301-400"
+            elif window == 500:
+                top_half = list(npDict.most_common(401))
+                bottom_half = list(npDict.most_common(500))
+                top = [item for item in bottom_half if item not in top_half]
+                message_window = "401-500"
+            elif window == 600:
+                top_half = list(npDict.most_common(501))
+                bottom_half = list(npDict.most_common(600))
+                top = [item for item in bottom_half if item not in top_half]
+                message_window = "501-600"
+            elif window == 700:
+                top_half = list(npDict.most_common(601))
+                bottom_half = list(npDict.most_common(700))
+                top = [item for item in bottom_half if item not in top_half]
+                message_window = "601-700"
+            elif window == 800:
+                top_half = list(npDict.most_common(701))
+                bottom_half = list(npDict.most_common(800))
+                top = [item for item in bottom_half if item not in top_half]
+                message_window = "701-800"
+            elif window == 900:
+                top_half = list(npDict.most_common(801))
+                bottom_half = list(npDict.most_common(900))
+                top = [item for item in bottom_half if item not in top_half]
+                message_window = "801-900"
+            elif window == 1000:
+                top_half = list(npDict.most_common(901))
+                bottom_half = list(npDict.most_common(1000))
+                top = [item for item in bottom_half if item not in top_half]
+                message_window = "901-1,000"
             else:
                 top = list(npDict.most_common(window))
 
@@ -217,7 +252,7 @@ def cyEmbeddings():
             #save to json
             logging.info("saving results to json ... ")
             embedding_json(keep_results, query, k_clusters, window, years)
-            message =  str(k_clusters) + " topics from the top ~" + str(window) + " noun phrases from " + str(message_years)
+            message =  str(k_clusters) + " topics from the top " + str(message_window) + " noun phrases from " + str(message_years)
             return render_template("embeddings.html", filepath=filepath, message=message)
 
         #if an analysis for this analysis already exists, just load it!
@@ -230,12 +265,34 @@ def cyEmbeddings():
                 message_years = "2015-2017"
             else:
                 message_years = str(years)
-            message = str(k_clusters) + " topics from the top ~" + str(window) + " noun phrases from " + str(message_years)
+            if window == 100:
+                message_window = "1-100"
+            if window == 200:
+                message_window = "101-200"
+            if window == 300:
+                message_window = "201-300"
+            if window == 400:
+                message_window = "301-400"
+            if window == 500:
+                message_window = "401-500"
+            if window == 600:
+                message_window = "501-600"
+            if window == 700:
+                message_window = "601-700"
+            if window == 800:
+                message_window = "701-800"
+            if window == 900:
+                message_window = "801-900"
+            if window == 1000:
+                message_window = "901-1,000"
+
+            message = str(k_clusters) + " topics from the top " + str(message_window) + " noun phrases from " + str(message_years)
             return render_template("embeddings.html", filepath=filepath, message=message)
 
     else:
         #Default data are my favorite topics found by algorithm in the top 300 topics for the top 30k words :')
-        filename = "fgraph_cyverse_20_10kFAV.json"
+        #filename = "fgraph_cyverse_20_10kFAV.json"
+        filename = "fgraph_cyverse_20_10kFAV_all.json"
         filepath = os.path.join('fgraphs', filename)
         message = "Our favorite 20 topics from the top 300,000 noun phrases from 2010-2017"
         return render_template("embeddings.html", filepath=filepath, message=message)
