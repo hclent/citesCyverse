@@ -22,7 +22,7 @@ logging.basicConfig(format='%(asctime)s %(message)s', datefmt='%m/%d/%Y %I:%M:%S
 
 #load model once globally
 logging.info("* LOADING FASTTEXT MODEL... THIS TAKES A WHILE...")
-#model = load_model("cyverse_lower.vec") #"cyverseModel.vec
+model = load_model("cyverse_lower.vec") #"cyverseModel.vec
 logging.info("!!! DONE LOADING FASTTEXT MODEL :')")
 
 #Form for Topic Modeling
@@ -46,7 +46,6 @@ def homeCyverse():
     return render_template("dashboard.html")
 
 
-#TODO: add buttons to switch between thingies
 @app.route("/cy-journals-freq/")
 def cyJournalsFreq():
     s_year = "2010" #start
@@ -72,9 +71,8 @@ def cyJournalsAlpha():
                            unique_journals=unique_journals, s_year=s_year, e_year=e_year)
 
 
-#TODO: make a new default
-#TODO: always say what the wordcloud is
-#Maybe use TF-IDF to filter words instead of most frequent?
+#TODO: how to scale clouds with only small results? Or scale results with very large results and small results?
+#TODO: add more suggestions for clouds to look like
 @app.route("/cy-wordcloud/", methods=["GET", "POST"])
 def cyWordcloud():
     form = wordCloudWord()
@@ -121,7 +119,6 @@ def cyWordcloud():
 
 
 
-#TODO sometimes failes cuz tag[i].startswith its being a list or something --> problem with 2015-2017 data
 #TODO: Needs better filtering of cyverse-specific/publication stopwords ("figure", "table") etc.
 #TODO: need to decide what the bins will be here for top NPs (only the top 400 is probably not ideal)
 @app.route("/cy-embeddings/", methods=["GET","POST"])

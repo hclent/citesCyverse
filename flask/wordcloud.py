@@ -1,7 +1,7 @@
-import os, json, pickle, nltk, logging, sys
+import os, json, pickle, nltk, logging, sys, math
 from collections import defaultdict, Counter
-from processors import *
 from sklearn.metrics.pairwise import cosine_similarity
+from processors import * #has the stuff necessary for chain
 from scipy import sparse
 sys.path.append('/home/hclent/repos/citesCyverse/flask/')
 from app import model
@@ -86,13 +86,33 @@ def wordcloud(query, nesDict, wordcloud_words):
     wordcloud_list = [] #will dump this to json
     query = query.lower()
 
+    """
+    MinMaxScaler formula is:
+    X_std = (X - X.min(axis=0)) / (X.max(axis=0) - X.min(axis=0))
+    X_scaled = X_std * (max - min) + min
+    """
+
+    # numbers = [int(nesDict[word]) for word in wordcloud_words]
+    # print(numbers)
+    # mySorted = list(sorted(numbers))
+    # print(mySorted)
+    # max = mySorted[-1] + 100
+    # print("max: "+ str(max))
+    # min = mySorted[0] - 100
+    # print("min: " + str(min))
     for word in wordcloud_words:
         size = nesDict[word]
         if size < 10:
             entry = {"text": word, "size": 10}
         else:
+            # s = int(nesDict[word])
+            # X_std = (s - min) / (max - min)
+            # print(X_std)
+            # X_scaled = X_std * (max - min) + min
+            # entry = {"text": word, "size": int(X_scaled)}
+            # print(X_scaled)
+            # print("#######")
             entry = {"text": word, "size": int(nesDict[word])} # if the size is too big (like 20,000) you MUST scale it or it will not show up in the vis
-
 
         wordcloud_list.append(entry)
 
@@ -123,7 +143,7 @@ def wordcloud(query, nesDict, wordcloud_words):
 ############################################################################
 #instead of using embeddings, gonna get the top 100 words
 # nesDict = frequency_dict("cyverse_lemmas_ALL.pickle")
-# wordcloud_words = (Counter(nesDict).most_common(250))
+# wordcloud_words = (Counter(nesDict).most_common(370))
 # cyverse_stop_words = ['university', '%', 'table', 'figure', '\\u', '\\\\', '\\', 'author', 'publication',
 #                           'appendix',
 #                           'table', 'author', 'skip', 'main', '.', 'title', 'u2009', 'publisher',
@@ -145,13 +165,10 @@ def wordcloud(query, nesDict, wordcloud_words):
 # keep_words = []
 # for w in wordcloud_words:
 #     word = w[0]
-#     if word not in cyverse_stop_words and not len(word)<3:
-#         keep_words.append(word)
-#         print(w)
+#     if word.lower() not in cyverse_stop_words and not len(word)<3:
+#         keep_words.append(word.lower())
 #
 # print(keep_words)
 # print(len(keep_words))
-# #
-# #
-# #
-# wordcloud_json = wordcloud("cyverseTop100", nesDict, keep_words)
+#
+# wordcloud_json = wordcloud("cyverseTop300", nesDict, keep_words)
