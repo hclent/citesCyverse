@@ -20,7 +20,7 @@
 <body>
 
 
-<div class="alert alert-info" role="alert">Recommended searches for wordcloud: sea, astronomy, python, cyverse, ...... etc. (Please use only one word at a time!)</div>
+<div class="alert alert-info" role="alert">Recommended searches for wordcloud: cyverse, nsf, python, sea, climate, astronomy, cancer, autism. (Please use only one word at a time!)</div>
 
 <div>
 <form action="https://geco.iplantcollaborative.org/hclent/citescyverse/cy-wordcloud/" class="form-inline" method="post">
@@ -46,7 +46,7 @@
         <h4 class="modal-title" id="myModalLabel">Loading</h4>
       </div>
       <div class="modal-body">
-
+          <p>This analysis usually takes about ~3 to ~4 minutes to run. </p>
 				<!-- Progress bar that doesn't actually move -->
 				<div class="progress">
 				  <div class="progress-bar progress-bar-primary progress-bar-striped active" role="progressbar" aria-valuenow="1" aria-valuemin="0" aria-valuemax="100" style="width: 45%">
@@ -114,22 +114,3 @@ var frequency_list = JSON.parse( myjson );
   }
 </script>
 
-
-<script>
-  var btn = document.getElementById('wcButton');
-  btn.addEventListener('click', loadProgress);
-  function loadProgress() {
-    //console.log('Button clicked!');
-    var progressBar = document.getElementsByClassName('progress-bar')[0];
-    var interval = 30;
-    var currentValue = 0;
-    for (var i = 0; i < 100; i += interval) {
-      //console.log('Setting interval', i)
-      setTimeout(function() {
-        currentValue += i;
-        //console.log('Setting progress width to:', currentValue, '%');
-        progressBar.setAttribute('style', 'width: ' + currentValue + '%');
-      }, i);
-    }
-  }
-</script>
