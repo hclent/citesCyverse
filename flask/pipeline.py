@@ -21,28 +21,28 @@ from fgraph2json import embedding_json
 
 
 #Get fasttexts vecs
-# filename = 'cyverse_lemmas_' + "2010" + '.pickle'
-# path = os.path.join("/home/hclent/repos/citesCyverse/flask/lemmas", filename)
-# print(path)
-#
-# with open(path, "rb") as f:
-#     lemma_samples = pickle.load(f)
+filename = 'cyverse_lemmas_pubmed.pickle'
+path = os.path.join("/home/hclent/repos/citesCyverse/flask/lemmas", filename)
+print(path)
 
-# flat_words, flat_tags = get_words_tags(path)
-# print(flat_words[:10])
-# print(flat_tags[:10])
-# print(type(flat_words))
-# print(type(flat_tags))
+with open(path, "rb") as f:
+    lemma_samples = pickle.load(f)
+
+flat_words, flat_tags = get_words_tags(path)
+print(flat_words[:10])
+print(flat_tags[:10])
+print(type(flat_words))
+print(type(flat_tags))
 
 
 #
-# xformed_tokens = transform_text(flat_words, flat_tags)
-# npDict = chooseTopNPs(xformed_tokens)
-# #print("LEN NPDICT BEFORE FILTERING: " + str(len(npDict.keys()))) #There are 249,199 noun phrases in the 760 documents
-#
-# ### OPTIONAL FILTER npDICT ####
-# top = list(npDict.most_common(1000))
-# other_top = list(npDict.most_common(1100))
+xformed_tokens = transform_text(flat_words, flat_tags)
+npDict = chooseTopNPs(xformed_tokens)
+#print("LEN NPDICT BEFORE FILTERING: " + str(len(npDict.keys()))) #There are 249,199 noun phrases in the 760 documents
+
+### OPTIONAL FILTER npDICT ####
+top = list(npDict.most_common(10000))
+# other_top = list(npDict.most_common(1500))
 # keep_top = [item for item in other_top if item not in top]
 
 '''
@@ -55,36 +55,37 @@ Above 4k the results aren't looking terrible and the counts are at 7
 
 # # ######
 model = load_model("17kmodel.vec")
-# matrix = getNPvecs(keep_top, model) #top or npDict can go here
+matrix = getNPvecs(top, model) #top or npDict can go here
 #
 # #do kmeans
-# kmeans = KMeans(n_clusters=20, random_state=2).fit(matrix)
-# results = list(zip(kmeans.labels_, keep_top))
+kmeans = KMeans(n_clusters=1000, random_state=2).fit(matrix)
+results = list(zip(kmeans.labels_, top))
 # #
 #
 # query = "cyverse"
-# for i in range(0, 21):
-#    topic = [tup for tup in results if tup[0] == i]
-#    print(topic)
-#    print("#" * 20)
+for i in range(0, 1001):
+   topic = [tup for tup in results if tup[0] == i]
+   print(topic)
+   print("#" * 20)
 
 
 
 
 def generateFiles():
    possible_ks = [10, 15, 20, 25]
-   possible_years = [2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 201014, 201517]
+   #possible_years = [2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 201014, 201517]
+   possible_years = [201014]
    possible_windows = [100, 200, 300, 400, 500, 600, 700, 800, 900, 1000]
 
    for year in possible_years:
-       if year == 201014:
-           save_year = "2010_2014"
-       if year == 201517:
-           save_year = "2015_2017"
-       else:
-           save_year = year
-
-       filename = 'cyverse_lemmas_' + str(save_year) + '.pickle'
+       # if year == 201014:
+       #     print("THE YEAR IS 201014")
+       #     save_year = "2010_2014"
+       # if year == 201517:
+       #     save_year = "2015_2017"
+       # else:
+       #     save_year = year
+       filename = 'cyverse_lemmas_pubmed.pickle'
        path = os.path.join("/home/hclent/repos/citesCyverse/flask/lemmas", filename)
        print(path)
        print(os.path.isfile(path))
@@ -159,7 +160,12 @@ def generateFiles():
                        if combo[0] not in delete_topics:
                            keep_results.append(combo)
 
-                   embedding_json(keep_results, "cyverse", k, window, year)
+                   for i in range(0, k+1):
+                      topic = [tup for tup in keep_results if tup[0] == i]
+                      print(topic)
+                      print("#" * 20)
+
+                   embedding_json(keep_results, "cyverse", k, window, "pubmed")
                    print("PRINTED A FILE TO FGRAPHS!")
            except Exception as e:
                print(e)
@@ -167,7 +173,7 @@ def generateFiles():
 
 
 
-generateFiles()
+#generateFiles()
 
 
 # favorite_results = [

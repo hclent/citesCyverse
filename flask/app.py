@@ -38,7 +38,7 @@ class visOptions(Form):
 
     y_years = SelectField('y_years', choices=[(201014, '2010-2014'), (201517, '2015-2017'), (2010, '2010'),
                                               (2011, '2011'),(2012, '2012'),(2013, '2013'),(2014, '2014'),
-                                              (2015, '2015'), (2016, '2016'), (2017, '2017')])
+                                              (2015, '2015'), (2016, '2016'), (2017, '2017'), (201017, "PubMedCentral 2010-2017")])
 
 #Form for Wordclouds
 class wordCloudWord(Form):
@@ -136,6 +136,8 @@ def cyEmbeddings():
 
         path_to_lemma_samples = '/home/hclent/repos/citesCyverse/flask/lemmas/'
         path_to_fgraphs = '/home/hclent/repos/citesCyverse/flask/static/fgraphs/'
+        if years == "201017":
+            years = "pubmed"
 
         filename = 'fgraph_' + str(query) + '_' + str(k_clusters) + '_' + str(window) + '_' + str(years) + '.json'
 
@@ -152,6 +154,9 @@ def cyEmbeddings():
             elif years == "201517":
                 year_interval = '2015_2017'
                 message_years = "2015-2017"
+            if years == "201017":
+                year_interval = "pubmed"
+                message_years = "2010-2017"
             else:
                 year_interval = str(years)
                 message_years = str(years)
@@ -263,6 +268,8 @@ def cyEmbeddings():
                 message_years = "2010-2014"
             elif years == "201517":
                 message_years = "2015-2017"
+            elif years == "201017":
+                message_years = "2010-2017"
             else:
                 message_years = str(years)
             if window == 100:
