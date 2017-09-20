@@ -1,4 +1,4 @@
-import string
+import string, pickle
 import naive_makeVecs as makeVecs #mine
 
 #TODO: get the citation labels and axis labels from the tsv
@@ -40,71 +40,20 @@ def load_corpus(corpus, eligible_papers):
         raw = "/home/hclent/data/corpora/darwin.txt"
         corpus_vec = loadMessages(raw)
         color = 'rgb(8, 114, 32)'
-    if corpus == 'frankenstein':
-        raw = "/home/hclent/data/corpora/frankenstein.txt"
-        corpus_vec = loadMessages(raw)
-        color = 'rgb(92, 59, 107)'
-    if corpus == 'youth':
-        raw = "/home/hclent/data/corpora/youth.txt"
-        corpus_vec = loadMessages(raw)
-        color = 'rgb(63, 100, 168)'
-    if corpus == 'austen':
-        raw = "/home/hclent/data/corpora/austen.txt"
-        corpus_vec = loadMessages(raw)
-        color = 'rgb(191, 110, 167)'
-    #new
     if corpus == 'brain_speech':
         raw = "/home/hclent/data/corpora/brain_speech.txt"
         corpus_vec = loadMessages(raw)
         color = 'rgb(8, 114, 32)'
-    if corpus == 'bible':
-        raw = "/home/hclent/data/corpora/bible.txt"
-        corpus_vec = loadMessages(raw)
-        color = 'rgb(92, 59, 107)'
     if corpus == 'grecoroman':
         raw = "/home/hclent/data/corpora/grecoroman_med.txt"
         corpus_vec = loadMessages(raw)
         color = 'rgb(8, 114, 32)'
-    if corpus == 'last_evolution':
-        raw = "/home/hclent/data/corpora/last_evolution.txt"
-        corpus_vec = loadMessages(raw)
-        color = 'rgb(63, 100, 168)'
-    if corpus == 'mars':
-        raw = "/home/hclent/data/corpora/mars.txt"
-        corpus_vec = loadMessages(raw)
-        color = 'rgb(63, 100, 168)'
     if corpus == 'mouse':
         raw = "/home/hclent/data/corpora/mouse.txt"
         corpus_vec = loadMessages(raw)
         color = 'rgb(8, 114, 32)'
-    if corpus == 'sherlock':
-        raw = "/home/hclent/data/corpora/sherlock.txt"
-        corpus_vec = loadMessages(raw)
-        color = 'rgb(92, 59, 107)'
     if corpus == 'yeast':
         raw = "/home/hclent/data/corpora/yeast.txt"
-        corpus_vec = loadMessages(raw)
-        color = 'rgb(8, 114, 32)'
-    # For loading the query papers
-    # eligible_papers = [('paper1', '18952863', '/home/hclent/data/pmcids/259/367/2593677.txt')]
-    if corpus == 'paper1':
-        raw = str(eligible_papers[0][2]) #'/home/hclent/data/pmcids/259/367/2593677.txt'
-        corpus_vec = loadMessages(raw)
-        color = 'rgb(8, 114, 32)'
-    if corpus == 'paper2':
-        raw = str(eligible_papers[1][2])
-        corpus_vec = loadMessages(raw)
-        color = 'rgb(8, 114, 32)'
-    if corpus == 'paper3':
-        raw = str(eligible_papers[2][2])
-        corpus_vec = loadMessages(raw)
-        color = 'rgb(8, 114, 32)'
-    if corpus == 'paper4':
-        raw = str(eligible_papers[3][2])
-        corpus_vec = loadMessages(raw)
-        color = 'rgb(8, 114, 32)'
-    if corpus == 'paper5':
-        raw = str(eligible_papers[4][2])
         corpus_vec = loadMessages(raw)
         color = 'rgb(8, 114, 32)'
     #also gonna have to put in an exception handler for if there is no PMCID for the input paper (thus no corpus)
@@ -113,11 +62,12 @@ def load_corpus(corpus, eligible_papers):
 
 
 #Updated to use new cache :) yay
-def load_datasamples(query):
-    lemma_samples = load_lemma_cache(query)
+def load_datasamples():
+    with open("/home/hclent/repos/citesCyverse/flask/lemmas/cyverse_lemmas_ALL.pickle", "rb") as f:
+        lemma_samples = pickle.load(f)
     lemma_list = [l[1] for l in lemma_samples]
     pmcids_list = [l[0] for l in lemma_samples]
-    list_data_strings = [' '.join(map(str, l)) for l in  lemma_list]
+    list_data_strings = [' '.join(map(str, l)) for l in lemma_list] #['string string', 'string string string']
     data_vecs_list = loadFromDataSamples(list_data_strings)
     return data_vecs_list, pmcids_list
 
@@ -145,7 +95,9 @@ def get_cosine_eligible(corpus_vec, eligible_papers):
             eligible_cosines.append(score)
     return eligible_cosines
 
-
+data_vecs_list, pmcids_list = load_datasamples()
+print(data_vecs_list[0])
+print(pmcids_list[0])
 
 
 
@@ -180,7 +132,6 @@ def add_urls(cosine_list, color, pmcids_list, conn):
     combo = list(zip(cosine_list, histogram_labels, apa_labels, colors_list))
     sorted_combos = sorted(combo, reverse=False)
     return sorted_combos
-
 
 
 #eligible_papers = [('paper1', '18952863', '/home/hclent/data/pmcids/259/367/2593677.txt')]
