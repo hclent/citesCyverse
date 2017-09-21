@@ -306,13 +306,14 @@ def cyEmbeddings():
 #The corpora for these live on geco
 @app.route("/cy-textcompare/")
 def cyTextCompare():
-    corpus_vec, color = load_corpus("darwin")
-    data_vecs_list, pmcids_list = load_datasamples()
-    cosine_list = get_cosine_list(corpus_vec, data_vecs_list)
-    sorted_combos = add_urls(cosine_list, color, pmcids_list)
-    x, y, names, color = prepare_for_histogram(sorted_combos)
-    title = "DARWIN OR WHATEVER"
-    return render_template("textcompare.html", x=x, y=y, title=title, color=color, names=names)
+    # corpus_vec, color = load_corpus("darwin")
+    # data_vecs_list, pmcids_list = load_datasamples()
+    # cosine_list = get_cosine_list(corpus_vec, data_vecs_list)
+    # sorted_combos = add_urls(cosine_list, color, pmcids_list)
+    # x, y, names, color = prepare_for_histogram(sorted_combos)
+    # title = "DARWIN OR WHATEVER"
+    # return render_template("textcompare.html", x=x, y=y, title=title, color=color, names=names)
+    return render_template("textcompare_darwin.html")
 
 
 @app.errorhandler(404)

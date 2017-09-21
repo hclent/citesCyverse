@@ -161,8 +161,8 @@ def add_urls(cosine_list, color, pmcids_list):
             journal = list_for_apa[3]
             label = str(auth+' ('+year+'). '+title+'. '+journal)
 
-            #graph_label = str(i)
-            histogram_labels.append(label)
+            graph_label = "Paper " + str(i)
+            histogram_labels.append(graph_label)
             apa_labels.append(label)
         except Exception as e:
             pass
@@ -175,7 +175,7 @@ def add_urls(cosine_list, color, pmcids_list):
     #
     #need to sort the histogram_labels to match that order
     combined = list(zip(cosine_list, histogram_labels, apa_labels, colors_list))
-    sorted_combos = sorted(combined, reverse=False)
+    sorted_combos = sorted(combined,  key=lambda x: x[0], reverse=False)
     #print(len(sorted_combos))
     return sorted_combos
 
