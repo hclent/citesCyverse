@@ -10,6 +10,7 @@
 *.pickle
 *.vec
 *.bin 
+*.ico
 .DS_Store
 .bowerrc
 .idea/
