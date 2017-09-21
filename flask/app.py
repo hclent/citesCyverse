@@ -117,7 +117,7 @@ def cyWordcloud():
         message = "Cloud for top 200 words in all citing papers"
         with open(path) as f:
             wordcloud_data = str(json.load(f))
-            return render_template("wordcloud.html", wordcloud_data=wordcloud_data, message=message)
+            return render_template("wordcloud_default.html", wordcloud_data=wordcloud_data, message=message)
 
 
 @app.route("/cy-embeddings/", methods=["GET","POST"])
