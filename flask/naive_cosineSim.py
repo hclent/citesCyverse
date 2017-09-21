@@ -1,4 +1,4 @@
-import string, pickle
+import string, pickle, csv, re
 import naive_makeVecs as makeVecs #mine
 
 #TODO: get the citation labels and axis labels from the tsv
@@ -31,7 +31,7 @@ def cosineSimilarityScore(vector1, vector2):
 
 
 #only load eligible_papers into load_corpus
-def load_corpus(corpus, eligible_papers):
+def load_corpus(corpus):
     if corpus == 'startrek':
         raw = "/home/hclent/data/corpora/startrek/105.txt"
         corpus_vec = loadMessages(raw)
@@ -56,8 +56,6 @@ def load_corpus(corpus, eligible_papers):
         raw = "/home/hclent/data/corpora/yeast.txt"
         corpus_vec = loadMessages(raw)
         color = 'rgb(8, 114, 32)'
-    #also gonna have to put in an exception handler for if there is no PMCID for the input paper (thus no corpus)
-    #can return a flash error for that
     return corpus_vec, color
 
 
@@ -82,98 +80,104 @@ def get_cosine_list(corpus_vec, data_vecs_list):
     return cosine_list
 
 
-#get cosine scores for any eligible papers
-def get_cosine_eligible(corpus_vec, eligible_papers):
-    eligible_cosines = []
-    if len(eligible_papers) > 0:
-        for paper in eligible_papers:
-            filename = paper[2]
-            vector_counter = loadMessages(filename)
-            cosine_score = cosineSimilarityScore(corpus_vec, vector_counter)
-            score = float("{0:.4f}".format(float(cosine_score)))
-            score = float(score * 100)  # .25 --> 25%
-            eligible_cosines.append(score)
-    return eligible_cosines
-
-data_vecs_list, pmcids_list = load_datasamples()
-print(data_vecs_list[0])
-print(pmcids_list[0])
-
 
 
 #take the list cosines and match scores with the url to the paper
 #Updated with new titles, making sure there's no repeats :)
-def add_urls(cosine_list, color, pmcids_list, conn):
+def add_urls(cosine_list, color, pmcids_list):
 
     histogram_labels = [] #this is what will be in the visualization
     apa_labels = []
 
-    alphabet = list(string.ascii_lowercase)
-    for pmcid in pmcids_list:
-        label = db_citations_mini_hyperlink(pmcid, conn)
-        keep_label = label[0]  # there could be multiple records from db, so just take the first one
-        # Step 1: check if its in the x list
-        repeat_count = histogram_labels.count(keep_label)
-        if repeat_count > 0:
-            # eww hacky yucky i'm really sorry!
-            add_letter = alphabet[repeat_count]
-            keep_label = keep_label[:4] + add_letter + keep_label[4:]
-        elif repeat_count == 0:
-            pass
-        histogram_labels.append(keep_label)
-        #get the hyperlink apa_lables
-        hyperlink_list = db_citations_hyperlink_retrieval(pmcid, conn)
-        keep_hyperlink = hyperlink_list[0]
-        apa_labels.append(keep_hyperlink)
+    tsvDict = {}
+    #{'id': [author, pubdate, title, journal]}
 
-    colors_list = [color] * int(len(histogram_labels))
+    #apa = str(author+' ('+pubdate+'). '+title+'. '+journal+'. Retrieved from '+url)
+    potential_ids = []
+    potential_authors = []
+    potential_years_list = []
+    potential_titles = []
+    potential_journals_list = []
 
-    #need to sort the histogram_labels to match that order
-    combo = list(zip(cosine_list, histogram_labels, apa_labels, colors_list))
-    sorted_combos = sorted(combo, reverse=False)
-    return sorted_combos
+    # TODO: check for bio status
+    with open('journalsNoDuplicates.tsv', 'r') as tsvin:
+        tsv = csv.reader(tsvin, delimiter='\t')
+        next(tsv)
+        next(tsv) #skip the first two rows
 
-
-#eligible_papers = [('paper1', '18952863', '/home/hclent/data/pmcids/259/367/2593677.txt')]
-def add_eligible_cosines(sorted_combos, eligible_papers, eligible_cosines, conn):
-    labels_thus_far = [c[1] for c in sorted_combos]
-
-    alphabet = list(string.ascii_lowercase)
-    #get the label for the eligible papers!
-
-    if len(eligible_papers) > 0:
-        histogram_labels = []
-        click_label = []
-        for e in eligible_papers:
-            pmid = e[1]
-            label = db_pmid_axis_label(pmid, conn)
-            keep_label = label[0] #there might be multiple, just get first
-
-            #check if the label is unique from others. plotly deletes duplicate lables :/
-            repeat_count = labels_thus_far.count(keep_label)
-            if repeat_count > 0:
-                add_letter = alphabet[repeat_count]
-                keep_label = keep_label[:4] + add_letter + keep_label[4:]
-            elif repeat_count == 0:
+        for row in tsv:
+            try:
+                id = (row[10]) #get rid of .txt
+                fixed_id = re.sub('\.txt', '', id)
+                potential_ids.append(fixed_id)
+            except Exception as e0:
+                #text file
+                pass
+            try:
+                author = (row[0])
+                potential_authors.append(author)
+            except Exception as e1:
+                #no author
+                pass
+            try:
+                year = (row[4])
+                potential_years_list.append(year)
+            except Exception as e2:
+                # no year
+                pass
+            try:
+                title = (row[1])
+                potential_titles.append(title)
+            except Exception as e3:
+                #no title
+                pass
+            try:
+                journal = (row[2])
+                potential_journals_list.append(journal)
+            except Exception as e4:
+                # no journal
                 pass
 
-            hyperlink = db_pmid_hyperlink_retrieval(pmid, conn)
-            keep_hyperlink = hyperlink[0]
+    combo = list(zip(potential_ids, potential_authors, potential_years_list, potential_titles, potential_journals_list))
 
-            histogram_labels.append(keep_label)
+    for c in combo:
+        possible_id = c[0]
+        possible_author = c[1]
+        possible_year = c[2]
+        possible_title = c[3]
+        possible_journal = c[4]
+        year = re.search('\d{4}', possible_year)
+        if year and possible_journal != '' and possible_id != '' and possible_author != '' and possible_title != '':  # if all the stuff isn't empty
+            y = str(year.group(0))
+            j = str(possible_journal)
+            tsvDict[possible_id] = [possible_author, y, possible_title, j]
 
-            click_label.append(keep_hyperlink)
+    for i, pmcid in enumerate(pmcids_list):
+        try:
+            list_for_apa = tsvDict[pmcid]
+            auth = list_for_apa[0]
+            year = list_for_apa[1]
+            title = list_for_apa[2]
+            journal = list_for_apa[3]
+            label = str(auth+' ('+year+'). '+title+'. '+journal)
 
-        color = 'rgb(244, 241, 48)' #Hilight inputPapers in Yellow :)
-        colors_list = [color] * int(len(histogram_labels))
-        combo = list(zip(eligible_cosines, histogram_labels, click_label, colors_list))
-        all_combos = sorted_combos + combo
-        sorted_all_combos =  sorted(all_combos, reverse=False)
-        return sorted_all_combos
+            #graph_label = str(i)
+            histogram_labels.append(label)
+            apa_labels.append(label)
+        except Exception as e:
+            pass
+            #maybe I don't have the file? idk
+    #
+    colors_list = [color] * int(len(histogram_labels))
+    #print(len(histogram_labels))
+    #print(len(apa_labels))
 
-    #if there are no eligible papers just pass
-    if len(eligible_papers) == 0:
-        return sorted_combos
+    #
+    #need to sort the histogram_labels to match that order
+    combined = list(zip(cosine_list, histogram_labels, apa_labels, colors_list))
+    sorted_combos = sorted(combined, reverse=False)
+    #print(len(sorted_combos))
+    return sorted_combos
 
 
 def prepare_for_histogram(sorted_combos):
@@ -187,3 +191,11 @@ def prepare_for_histogram(sorted_combos):
         names.append(combo[2])
         color.append(combo[3])
     return x, y, names, color
+
+
+
+# corpus_vec, color = load_corpus("darwin")
+# data_vecs_list, pmcids_list = load_datasamples()
+# cosine_list = get_cosine_list(corpus_vec, data_vecs_list)
+# sorted_combos = add_urls(cosine_list, color, pmcids_list)
+# x, y, names, color = prepare_for_histogram(sorted_combos)

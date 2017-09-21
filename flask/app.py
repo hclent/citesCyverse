@@ -10,6 +10,7 @@ from sklearn.cluster import KMeans
 from fasttext import get_words_tags, transform_text, chooseTopNPs, load_model, getNPvecs
 from fgraph2json import embedding_json
 from wordcloud import *
+from naive_cosineSim import load_corpus, load_datasamples, get_cosine_list, add_urls, prepare_for_histogram
 
 
 
@@ -119,9 +120,6 @@ def cyWordcloud():
             return render_template("wordcloud.html", wordcloud_data=wordcloud_data, message=message)
 
 
-
-
-#TODO: Needs better filtering of cyverse-specific/publication stopwords ("figure", "table") etc.
 @app.route("/cy-embeddings/", methods=["GET","POST"])
 def cyEmbeddings():
     query = "cyverse"
@@ -308,11 +306,14 @@ def cyEmbeddings():
 #The corpora for these live on geco
 @app.route("/cy-textcompare/")
 def cyTextCompare():
-    return render_template("textcompare.html")
+    corpus_vec, color = load_corpus("darwin")
+    data_vecs_list, pmcids_list = load_datasamples()
+    cosine_list = get_cosine_list(corpus_vec, data_vecs_list)
+    sorted_combos = add_urls(cosine_list, color, pmcids_list)
+    x, y, names, color = prepare_for_histogram(sorted_combos)
+    title = "DARWIN OR WHATEVER"
+    return render_template("textcompare.html", x=x, y=y, title=title, color=color, names=names)
 
-@app.route('/test/')
-def testingStuff():
-    return("test!!")
 
 @app.errorhandler(404)
 def page_not_found(e):

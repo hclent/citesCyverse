@@ -1,1 +1,123 @@
-Coming soon... :')
+<html>
+<head>
+    <!--plotly scripts -->
+<script src="{{ url_for('static', filename='js/third-party/plotly/dist/plotly.min.js') }}"></script>
+    <!--bootstrap scripts -->
+	    <link href= "{{ url_for('static',
+	filename='js/third-party/bootstrap/dist/css/bootstrap.min.css')}}" rel="stylesheet">
+    <script src="{{ url_for('static', filename='js/third-party/jquery/dist/jquery.min.js') }}"></script>
+	<script type="text/javascript" src="{{ url_for('static', filename='js/third-party/bootstrap/dist/js/bootstrap.min.js') }}">
+	</script>
+
+
+</head>
+
+
+<body>
+<form class="form inline">
+<div class="form-group">
+  <label for="buttongroup">Select a text to compare:</label>
+  <div id="buttongroup">
+     <div class="col-xs-6 col-sm-4">
+    <select class="form-control" id="corpus" name="corpus">
+        <option name="darwin" value="darwin">On the Origin of Species</option>
+        <option name="yeast" value="yeast">Yeast</option>
+        <option name="mouse" value="mouse">The Dancing Mouse</option>
+        <option name="brain_speech" value="brain_speech">The Brain & The Voice</option>
+        <option name="grecoroman" value="grecoroman">Outlines of Greek & Roman Medicine</option>
+      <option name="startrek" value="startrek">Star Trek corpus</option>
+       </select>
+       </div>
+
+
+  <button type="submit" id="litbutton" class="btn btn-default" data-toggle="modal" data-target="#myModal">Update</button>
+
+   </div>
+  </div>
+</form>
+
+
+  <div id="myDiv" style="width: 680px; height: 600px;"><!-- Plotly chart will be drawn inside this DIV --></div>
+<div id="clickInfo"> </div>
+
+  <script>
+    var myPlot = document.getElementById('myDiv'),
+	clickInfo = document.getElementById('clickInfo'),
+    data = [{
+    x: {{ x | safe }},
+    y: {{ y | safe }} ,
+    name: {{names| safe}},
+    marker: {
+        color: {{color | safe}}
+    },
+    type: 'bar'
+        }];
+            layout = {
+              title: 'Cosine Similarity to {{title}} (%)',
+                margin: {
+                    b: 160
+                }
+            };
+        Plotly.newPlot('myDiv', data, layout);
+      myPlot.on('plotly_click', function(data){
+	for (var i=0; i<data.points.length; i++) { //safety net
+		var selected_point = data.points[i];
+//        console.log(selected_point)
+		var point_number = data.points[i].pointNumber;
+		var point_data = selected_point['data'];
+		var point_title = point_data['name'][point_number];
+//		var point_title = data.points[i]['data']['name'][data.points[i].pointNumber];
+//		console.log(point_title);
+		clickInfo.innerHTML = point_title;
+	}
+});  //end plotly_click
+  </script>
+
+ <!-- Progress modal -->
+<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+        <h4 class="modal-title" id="myModalLabel">Loading</h4>
+      </div>
+      <div class="modal-body">
+
+				<!-- Progress bar that doesn't actually move -->
+				<div class="progress">
+				  <div class="progress-bar progress-bar-success progress-bar-striped active" role="progressbar" aria-valuenow="1" aria-valuemin="0" aria-valuemax="100" style="width: 45%">
+				    <span class="sr-only">45% Complete</span>
+				  </div>
+				</div>
+
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+</body>
+
+<script>
+  var btn = document.getElementById('litbutton');
+  btn.addEventListener('click', loadProgress);
+  function loadProgress() {
+    //console.log('Button clicked!');
+    var progressBar = document.getElementsByClassName('progress-bar')[0];
+    var interval = 30;
+    var currentValue = 0;
+    for (var i = 0; i < 100; i += interval) {
+      //console.log('Setting interval', i)
+      setTimeout(function() {
+        currentValue += i;
+        //console.log('Setting progress width to:', currentValue, '%');
+        progressBar.setAttribute('style', 'width: ' + currentValue + '%');
+      }, i);
+    }
+  }
+</script>
