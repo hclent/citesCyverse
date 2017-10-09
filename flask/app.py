@@ -23,7 +23,7 @@ logging.basicConfig(format='%(asctime)s %(message)s', datefmt='%m/%d/%Y %I:%M:%S
 
 #load model once globally
 logging.info("* LOADING FASTTEXT MODEL... THIS TAKES A WHILE...")
-model = load_model("cyverse_lower.vec") #"cyverseModel.vec
+model = load_model("/home/hclent/tmp/fastText/cyverse_lower.vec") #"cyverseModel.vec
 logging.info("!!! DONE LOADING FASTTEXT MODEL :')")
 
 #Form for Topic Modeling
@@ -48,6 +48,7 @@ class wordCloudWord(Form):
 
 @app.route("/home/")
 def homeCyverse():
+    #return("We're so sorry! But CitesCyverse is down for maintenance right now! We expect it to be back up by Monday night (October 9th) by 10PM Mountain Time at the latest. Thank you for your patience!")
     return render_template("dashboard.html")
 
 
@@ -112,11 +113,11 @@ def cyWordcloud():
 
     else:
         path_to_wordcloud = "/home/hclent/repos/citesCyverse/flask/static/wordclouds"
-        filename = "cyverseTop100.json" #this is saved as top 100 but its really the top 200 oops
+        filename = "cyversetop300.json" #this is saved as top 100 but its really the top 200 oops
         path = os.path.join(path_to_wordcloud, filename)
-        message = "Cloud for top 200 words in all citing papers"
+        message = "Cloud for top 300 words in all citing papers"
         with open(path) as f:
-            wordcloud_data = str(json.load(f))
+            wordcloud_data = json.load(f)
             return render_template("wordcloud_default.html", wordcloud_data=wordcloud_data, message=message)
 
 
@@ -142,121 +143,9 @@ def cyEmbeddings():
         full_filepath = os.path.join(path_to_fgraphs, filename) #check this filepath to see if frgaph json exists
         filepath = os.path.join('fgraphs', filename) #load from this filepath
 
-
         #if a file for this analysis doesn't already exist, run the analysis and make the json
         if not os.path.isfile(full_filepath):
-
-            if years == "201014":
-                year_interval = '2010_2014'
-                message_years = "2010-2014"
-            elif years == "201517":
-                year_interval = '2015_2017'
-                message_years = "2015-2017"
-            if years == "201017":
-                year_interval = "pubmed"
-                message_years = "2010-2017"
-            else:
-                year_interval = str(years)
-                message_years = str(years)
-
-            filename = 'cyverse_lemmas_' + year_interval + '.pickle'
-            load_file = os.path.join(path_to_lemma_samples, filename)
-            logging.info(load_file)
-
-            logging.info(" extracing words and tags ... ")
-            flat_words, flat_tags = get_words_tags(load_file)
-            logging.info(type(flat_tags))
-            logging.info(type(flat_tags[0]))
-            logging.info("extracting NounPhrases ... ")
-            xformed_tokens = transform_text(flat_words, flat_tags)
-            npDict = chooseTopNPs(xformed_tokens)
-
-            #top 100,200,300,400,500,1000,5000,10000, 25000, ??
-            ### OPTIONAL FILTER npDICT ####
-            if window == 100:
-                logging.info("w=1-100")
-                top = list(npDict.most_common(100))
-                message_window = "1-100"
-            elif window == 200:
-                logging.info("w=101-200")
-                top_100 = list(npDict.most_common(101))
-                top_200 = list(npDict.most_common(200))
-                top = [item for item in top_200 if item not in top_100]
-                message_window = "101-200"
-            elif window == 300:
-                logging.info("w=201-300")
-                top_200 = list(npDict.most_common(201))
-                top_300 = list(npDict.most_common(300))
-                top = [item for item in top_300 if item not in top_200]
-                message_window = "201-300"
-            elif window == 400:
-                logging.info("w=301-400")
-                top_300 = list(npDict.most_common(301))
-                top_400 = list(npDict.most_common(400))
-                top = [item for item in top_400 if item not in top_300]
-                message_window = "301-400"
-            elif window == 500:
-                top_half = list(npDict.most_common(401))
-                bottom_half = list(npDict.most_common(500))
-                top = [item for item in bottom_half if item not in top_half]
-                message_window = "401-500"
-            elif window == 600:
-                top_half = list(npDict.most_common(501))
-                bottom_half = list(npDict.most_common(600))
-                top = [item for item in bottom_half if item not in top_half]
-                message_window = "501-600"
-            elif window == 700:
-                top_half = list(npDict.most_common(601))
-                bottom_half = list(npDict.most_common(700))
-                top = [item for item in bottom_half if item not in top_half]
-                message_window = "601-700"
-            elif window == 800:
-                top_half = list(npDict.most_common(701))
-                bottom_half = list(npDict.most_common(800))
-                top = [item for item in bottom_half if item not in top_half]
-                message_window = "701-800"
-            elif window == 900:
-                top_half = list(npDict.most_common(801))
-                bottom_half = list(npDict.most_common(900))
-                top = [item for item in bottom_half if item not in top_half]
-                message_window = "801-900"
-            elif window == 1000:
-                top_half = list(npDict.most_common(901))
-                bottom_half = list(npDict.most_common(1000))
-                top = [item for item in bottom_half if item not in top_half]
-                message_window = "901-1,000"
-            else:
-                top = list(npDict.most_common(window))
-
-
-            logging.info("done collecting top NPs! ")
-            matrix = getNPvecs(top, model)
-
-            # do kmeans
-            logging.info("clustering vectors ... ")
-            kmeans = KMeans(n_clusters=k_clusters, random_state=2).fit(matrix)
-            results = list(zip(kmeans.labels_, top))
-
-            #filter topics
-            labels = [r[0] for r in results]
-
-            delete_topics = []
-            for i in range(0, k):
-                if labels.count(i) < 3:  # clean out topics with less than 3 words in them
-                    delete_topics.append(i)
-
-            keep_results = []
-
-            for combo in results:
-                if combo[0] not in delete_topics:
-                    keep_results.append(combo)
-
-
-            #save to json
-            logging.info("saving results to json ... ")
-            embedding_json(keep_results, query, k_clusters, window, years)
-            message =  str(k_clusters) + " topics from the top " + str(message_window) + " noun phrases from " + str(message_years)
-            return render_template("embeddings.html", filepath=filepath, message=message)
+            return("uh oh! some kind of error. I'll look into that!")
 
         #if an analysis for this analysis already exists, just load it!
         if os.path.isfile(full_filepath):
@@ -290,13 +179,11 @@ def cyEmbeddings():
                 message_window = "801-900"
             if window == 1000:
                 message_window = "901-1,000"
-
             message = str(k_clusters) + " topics from the top " + str(message_window) + " noun phrases from " + str(message_years)
             return render_template("embeddings.html", filepath=filepath, message=message)
 
     else:
         #Default data are my favorite topics found by algorithm in the top 300 topics for the top 30k words :')
-        #filename = "fgraph_cyverse_20_10kFAV.json"
         filename = "fgraph_cyverse_20_10kFAV_all.json"
         filepath = os.path.join('fgraphs', filename)
         message = "Our favorite 20 topics from the top 300,000 noun phrases from 2010-2017"
@@ -306,19 +193,13 @@ def cyEmbeddings():
 #The corpora for these live on geco
 @app.route("/cy-textcompare/")
 def cyTextCompare():
-    # corpus_vec, color = load_corpus("darwin")
-    # data_vecs_list, pmcids_list = load_datasamples()
-    # cosine_list = get_cosine_list(corpus_vec, data_vecs_list)
-    # sorted_combos = add_urls(cosine_list, color, pmcids_list)
-    # x, y, names, color = prepare_for_histogram(sorted_combos)
-    # title = "DARWIN OR WHATEVER"
-    # return render_template("textcompare.html", x=x, y=y, title=title, color=color, names=names)
     return render_template("textcompare_darwin.html")
 
 
 @app.errorhandler(404)
 def page_not_found(e):
     return("you shouldn't be here!! Heather's custom 404 error. ")
+
 
 #configuration settings
 if __name__ == '__main__':
