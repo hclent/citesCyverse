@@ -5,9 +5,13 @@ from processors import * #has the stuff necessary for chain
 from scipy import sparse
 sys.path.append('/home/hclent/repos/citesCyverse/flask/')
 from app import model
-#from fasttext import load_model
 
-#model = load_model("cyverse_lower.vec")
+#
+# from fasttext import load_model
+#
+# print("about to load the model...")
+# model = load_model("/home/hclent/tmp/fastText/cyverse_lower.vec")
+# print("loaded the friggen model")
 
 logging.basicConfig(filename='.app.log',level=logging.DEBUG)
 logging.basicConfig(format='%(asctime)s %(message)s', datefmt='%m/%d/%Y %I:%M:%S %p')
@@ -20,6 +24,7 @@ def flatten(listOfLists):
 
 #Step 1: Make dictionary with word counts for ALL cyverseDocs {'gluten': 5, 'span': 9}
 def frequency_dict(lemma_file):
+    #print("in frequency dict")
     #The Counter() is for if we want to get the top 100 words or w/e
     #nesDict = Counter(defaultdict(lambda: 0)) # can't pickle a default dict, but seems fast enought o generate..
 
@@ -43,8 +48,13 @@ def frequency_dict(lemma_file):
 
     path_to_lemma_samples = "/home/hclent/repos/citesCyverse/flask/lemmas"
     full_filename = os.path.join(path_to_lemma_samples, lemma_file) #pickle
+    #print(full_filename)
     with open(full_filename, "rb") as f:
         lemma_samples = pickle.load(f)
+
+    #print("opened the pickle!")
+    #print(len(lemma_samples))
+    #print(lemma_samples[0])
 
     words = [l[1] for l in lemma_samples]
     flat_words = flatten(words)
@@ -142,6 +152,7 @@ def wordcloud(query, nesDict, wordcloud_words):
 
 ############################################################################
 #instead of using embeddings, gonna get the top 100 words
+# nesDict = frequency_dict("cyverse_lemmas.pickle")
 # nesDict = frequency_dict("cyverse_lemmas_ALL.pickle")
 # wordcloud_words = (Counter(nesDict).most_common(370))
 # cyverse_stop_words = ['university', '%', 'table', 'figure', '\\u', '\\\\', '\\', 'author', 'publication',
