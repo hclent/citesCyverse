@@ -102,11 +102,11 @@ def journals_vis(years_range, years_list, journals):
 	#print(journalsTotalDict)
 
 	#This sourts by A --> Z journal names
-	#unique_journals = list(sorted(journalsTotalDict.keys(), key=str.lower))
+	unique_journals = list(sorted(journalsTotalDict.keys(), key=str.lower))
 
 	# Sorted by counts MOST --> LEAST
-	sorted_dict = sorted(journalsTotalDict.items(), key=operator.itemgetter(1), reverse=True)
-	unique_journals = [journal[0] for journal in sorted_dict]
+	#sorted_dict = sorted(journalsTotalDict.items(), key=operator.itemgetter(1), reverse=True)
+	#unique_journals = [journal[0] for journal in sorted_dict]
 
 
 	publication_data = []
@@ -153,7 +153,7 @@ def journals_vis(years_range, years_list, journals):
 	#Example range info: [('2008', '2016'), 165, 48] means years 2008-2016, 165 publications, 48 unique journals
 
 	publication_data = json.dumps(publication_data)
-	with open('/home/hclent/repos/citesCyverse/flask/static/journalsvis_freq.json' ,'w') as outfile:
+	with open('/home/hclent/repos/citesCyverse/flask/static/journalsvis_alpha.json' ,'w') as outfile:
 		json.dump(publication_data, outfile)
 
 	return publication_data, range_info
