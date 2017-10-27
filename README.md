@@ -10,8 +10,7 @@ This "CitesCyVerse" site was built and based off of work done by SCKE: The Scien
 
 See where the people cite you are being published
 
-![Screencap of Journals]
-(https://github.com/hclent/citesCyverse/blob/master/flask/static/images/cc1.png)
+![Screencap of Journals](https://github.com/hclent/citesCyverse/blob/master/flask/static/images/cc1.png)
 
 ### WordClouds
 
